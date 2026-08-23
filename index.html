@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Mob Run - Pi Game</title>
-  <!-- 1. Tích hợp Pi Network JavaScript SDK -->
+  <title>Mob Run - Game Pi Network</title>
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
   <style>
     * {
@@ -23,6 +22,7 @@
       height: 100vh;
       width: 100vw;
       font-family: Arial, sans-serif;
+      position: relative;
     }
     #gameCanvas {
       background-color: #cdc4b2;
@@ -31,25 +31,110 @@
       max-width: 100vw;
       aspect-ratio: 540 / 800;
     }
+    #pi-auth-container {
+      position: absolute;
+      top: 12px;
+      right: 15px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #sign-in-button {
+      background: #ffb703;
+      color: #1a1a1a;
+      border: 2px solid #ffffff;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 13px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    #user-profile {
+      display: none;
+      background: rgba(20, 20, 30, 0.85);
+      color: #ffd700;
+      border: 1px solid #ffd700;
+      padding: 5px 12px;
+      border-radius: 15px;
+      font-size: 13px;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
 
+  <!-- Khu vực nút Đăng nhập / Thông tin tài khoản Pi -->
+  <div id="pi-auth-container">
+    <button id="sign-in-button" onclick="signIn()">Đăng nhập Pi</button>
+    <div id="user-profile"></div>
+  </div>
+
   <canvas id="gameCanvas" width="540" height="800"></canvas>
 
   <script>
-    // ----------------- KHỞI TẠO PI SDK -----------------
-    const Pi = window.Pi;
-    if (Pi) {
+    let isAuthenticating = false;
+
+    // Khởi tạo Pi SDK (Promise) và tự động kích hoạt xác thực
+    async function initPi() {
+      if (typeof window.Pi === "undefined") {
+        console.warn("Không tìm thấy Pi SDK.");
+        return;
+      }
+
       try {
-        Pi.init({ version: "2.0", sandbox: true });
-        console.log("Pi SDK initialized successfully.");
+        await window.Pi.init({ version: "2.0", sandbox: true });
+        await signIn();
       } catch (err) {
-        console.warn("Chạy ngoài môi trường Pi Browser:", err);
+        console.error("Khởi tạo Pi SDK thất bại:", err);
       }
     }
 
-    // ----------------- CẤU HÌNH CANVAS & GAME -----------------
+    // Hàm xác thực đăng nhập người dùng Pi
+    async function signIn() {
+      if (!window.Pi || isAuthenticating) return;
+      isAuthenticating = true;
+
+      const scopes = ["username"];
+
+      function onIncompletePaymentFound(payment) {
+        console.log("Tìm thấy giao dịch chưa hoàn tất:", payment);
+      }
+
+      try {
+        const authResult = await window.Pi.authenticate(scopes, onIncompletePaymentFound);
+        
+        // Gửi accessToken về Backend để xác thực
+        const response = await fetch("/api/auth/pi", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ accessToken: authResult.accessToken })
+        });
+
+        if (!response.ok) {
+          throw new Error(`Lỗi máy chủ xác thực: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        
+        // Cập nhật giao diện khi đăng nhập thành công
+        document.getElementById("sign-in-button").style.display = "none";
+        const userProfile = document.getElementById("user-profile");
+        userProfile.style.display = "block";
+        userProfile.innerText = `@${data.user.username}`;
+      } catch (error) {
+        console.error("Lỗi xác thực:", error);
+      } finally {
+        isAuthenticating = false;
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", initPi);
+
+    // ----------------- CƠ CHẾ VÀ ĐỒ HỌA GAME -----------------
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
@@ -60,7 +145,7 @@
     const playerY = 660;
     let mobCount = 15;
     const scrollSpeed = 1.8;
-    let gameState = "PLAYING"; // PLAYING, GAMEOVER
+    let gameState = "PLAYING";
 
     let score = 0;
     let bossDefeated = 0;
@@ -74,31 +159,26 @@
     let bosses = [];
     let shootCd = 0;
 
-    // ----------------- VẼ NHÂN VẬT -----------------
     function drawSoldier(x, y, isBlue = true, scale = 1.0) {
       const bodyCol = isBlue ? "#0d47a1" : "#b71c1c";
       const hatCol = isBlue ? "#1976d2" : "#e53935";
       const skinCol = "#f5cdb0";
 
-      // Bóng
       ctx.fillStyle = "rgba(0,0,0,0.15)";
       ctx.beginPath();
       ctx.ellipse(x, y + 6 * scale, 6 * scale, 3 * scale, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Thân
       ctx.fillStyle = bodyCol;
       ctx.beginPath();
       ctx.arc(x, y + 3 * scale, 5 * scale, 0, Math.PI * 2);
       ctx.fill();
 
-      // Mặt
       ctx.fillStyle = skinCol;
       ctx.beginPath();
       ctx.arc(x, y - 1 * scale, 4 * scale, 0, Math.PI * 2);
       ctx.fill();
 
-      // Mũ
       ctx.fillStyle = hatCol;
       ctx.beginPath();
       ctx.ellipse(x, y - 3 * scale, 4 * scale, 3 * scale, 0, 0, Math.PI * 2);
@@ -108,13 +188,11 @@
     function drawBoss3D(boss) {
       const { x, y, hp, maxHp, flashTimer } = boss;
 
-      // Bóng đổ
       ctx.fillStyle = "rgba(0,0,0,0.25)";
       ctx.beginPath();
       ctx.ellipse(x, y + 25, 55, 20, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Thân áo đỏ dạng khối 3D
       ctx.fillStyle = "#c31e1e";
       ctx.beginPath();
       ctx.moveTo(x - 30, y - 10);
@@ -124,44 +202,36 @@
       ctx.closePath();
       ctx.fill();
 
-      // Bắp tay 3D
       ctx.fillStyle = "#ffbe8c";
       ctx.beginPath();
       ctx.ellipse(x - 38, y + 2, 11, 16, 0, 0, Math.PI * 2);
       ctx.ellipse(x + 38, y + 2, 11, 16, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Đầu & Mặt
       ctx.beginPath();
       ctx.arc(x, y - 28, 17, 0, Math.PI * 2);
       ctx.fill();
 
-      // Mắt đỏ
       ctx.fillStyle = "#ff0000";
       ctx.beginPath();
       ctx.arc(x - 6, y - 28, 3, 0, Math.PI * 2);
       ctx.arc(x + 6, y - 28, 3, 0, Math.PI * 2);
       ctx.fill();
 
-      // Tóc vàng 3D
       ctx.fillStyle = "#ffe650";
       ctx.beginPath();
       ctx.arc(x, y - 38, 15, 0, Math.PI * 2);
       ctx.fill();
 
-      // Súng Gatling trên tay
       const gunX = x + 18;
       const gunY = y + 5;
       ctx.fillStyle = "#2d3237";
       ctx.fillRect(gunX - 10, gunY - 10, 20, 22);
-
-      // Nòng súng
       ctx.fillStyle = "#191c1e";
       ctx.fillRect(gunX - 7, gunY + 12, 4, 25);
       ctx.fillRect(gunX - 2, gunY + 12, 4, 27);
       ctx.fillRect(gunX + 3, gunY + 12, 4, 25);
 
-      // Chớp lửa nòng súng khi bắn
       if (flashTimer > 0) {
         ctx.fillStyle = "#ffe650";
         ctx.beginPath();
@@ -173,7 +243,6 @@
         ctx.fill();
       }
 
-      // Thanh máu HP
       const hpPct = Math.max(0, hp / maxHp);
       ctx.fillStyle = "#282828";
       ctx.fillRect(x - 52, y - 76, 104, 12);
@@ -186,10 +255,9 @@
       ctx.fillStyle = "#ffffff";
       ctx.font = "bold 12px Arial";
       ctx.textAlign = "center";
-      ctx.fillText(`BOSS #${boss.level} HP: ${Math.ceil(hp)}`, x, y - 84);
+      ctx.fillText(`TRÙM #${boss.level} MÁU: ${Math.ceil(hp)}`, x, y - 84);
     }
 
-    // ----------------- SINH ĐƯỜNG ĐUA & LEVEL -----------------
     function spawnTrackSegment(startY, level) {
       for (let i = 0; i < 12; i++) {
         const gy = startY - i * 65;
@@ -247,7 +315,6 @@
 
     initGame();
 
-    // ----------------- SỰ KIỆN ĐIỀU KHIỂN CẢM ỨNG & CHUỘT -----------------
     let isDragging = false;
 
     function handlePointer(clientX) {
@@ -275,19 +342,16 @@
     }, { passive: false });
     window.addEventListener("touchend", () => { isDragging = false; });
 
-    // ----------------- VÒNG LẶP CHÍNH (GAME LOOP) -----------------
     function update() {
       if (gameState === "PLAYING") {
         score++;
 
-        // Tự động sinh chặng tiếp theo
         const activeBosses = bosses.filter(b => b.alive || b.y < SCREEN_HEIGHT);
         if (activeBosses.length === 0 || (bosses.length > 0 && bosses[bosses.length - 1].y > -500)) {
           currentBossLevel++;
           spawnTrackSegment(-200, currentBossLevel);
         }
 
-        // Tự động bắn đạn
         shootCd++;
         if (shootCd >= 3) {
           shootCd = 0;
@@ -298,14 +362,12 @@
           }
         }
 
-        // Cập nhật đạn người chơi
         for (let i = bullets.length - 1; i >= 0; i--) {
           const b = bullets[i];
           b.y -= b.speed;
           if (b.y < -30) { bullets.splice(i, 1); continue; }
 
           let hit = false;
-          // Bắn rào chắn
           for (let bar of barricades) {
             if (bar.hp > 0 && b.x >= bar.x && b.x <= bar.x + bar.w && b.y >= bar.y && b.y <= bar.y + bar.h) {
               bar.hp -= 1.5;
@@ -315,7 +377,6 @@
           }
           if (hit) { bullets.splice(i, 1); continue; }
 
-          // Bắn lính đỏ
           for (let e of redEnemies) {
             if (e.alive && Math.hypot(e.x - b.x, e.y - b.y) < 12) {
               e.alive = false;
@@ -325,7 +386,6 @@
           }
           if (hit) { bullets.splice(i, 1); continue; }
 
-          // Bắn Boss
           for (let boss of bosses) {
             if (boss.alive && Math.hypot(boss.x - b.x, boss.y - b.y) < 48) {
               boss.hp -= 3.5;
@@ -341,7 +401,6 @@
           if (hit) { bullets.splice(i, 1); continue; }
         }
 
-        // Cập nhật Boss & đạn Boss
         for (let i = bosses.length - 1; i >= 0; i--) {
           const boss = bosses[i];
           boss.y += scrollSpeed;
@@ -365,7 +424,6 @@
             }
           }
 
-          // Va chạm trực tiếp
           if (boss.alive && Math.hypot(playerX - boss.x, playerY - boss.y) < 70) {
             boss.hp -= 8;
             mobCount = Math.max(0, mobCount - 2);
@@ -378,7 +436,6 @@
           if (boss.y > SCREEN_HEIGHT + 150) bosses.splice(i, 1);
         }
 
-        // Cập nhật đạn Boss
         for (let i = bossBullets.length - 1; i >= 0; i--) {
           const bb = bossBullets[i];
           bb.x += bb.vx;
@@ -394,7 +451,6 @@
           }
         }
 
-        // Cổng
         for (let i = sideGates.length - 1; i >= 0; i--) {
           const g = sideGates[i];
           g.y += scrollSpeed;
@@ -405,7 +461,6 @@
           if (g.y > SCREEN_HEIGHT + 50) sideGates.splice(i, 1);
         }
 
-        // Rào chắn
         for (let i = barricades.length - 1; i >= 0; i--) {
           const bar = barricades[i];
           bar.y += scrollSpeed;
@@ -417,7 +472,6 @@
           if (bar.y > SCREEN_HEIGHT + 50) barricades.splice(i, 1);
         }
 
-        // Lính đỏ
         for (let i = redEnemies.length - 1; i >= 0; i--) {
           const e = redEnemies[i];
           e.y += scrollSpeed;
@@ -435,18 +489,15 @@
       }
     }
 
-    // ----------------- VẼ MÀN HÌNH (RENDER) -----------------
     function draw() {
       ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-      // Đường chạy bê tông
       ctx.fillStyle = "#b9bbc0";
       ctx.fillRect(35, 0, SCREEN_WIDTH - 70, SCREEN_HEIGHT);
       ctx.strokeStyle = "#8c8e94";
       ctx.lineWidth = 4;
       ctx.strokeRect(35, 0, SCREEN_WIDTH - 70, SCREEN_HEIGHT);
 
-      // Vẽ Cổng
       for (let g of sideGates) {
         ctx.fillStyle = g.isLeft ? "#2196f3" : "#ffd600";
         ctx.fillRect(g.x, g.y, g.w, g.h);
@@ -459,7 +510,6 @@
         ctx.fillText(`+${g.val}`, g.x + g.w / 2, g.y + 22);
       }
 
-      // Vẽ Rào chắn
       for (let bar of barricades) {
         if (bar.hp > 0) {
           ctx.fillStyle = "#5a5f64";
@@ -471,21 +521,18 @@
         }
       }
 
-      // Vẽ Lính đỏ
       for (let e of redEnemies) {
         if (e.alive && e.y > -20 && e.y < SCREEN_HEIGHT + 20) {
           drawSoldier(e.x, e.y, false, 0.9);
         }
       }
 
-      // Vẽ Boss 3D
       for (let boss of bosses) {
         if (boss.y > -120 && boss.y < SCREEN_HEIGHT + 100) {
           drawBoss3D(boss);
         }
       }
 
-      // Vẽ Đạn người chơi
       for (let b of bullets) {
         ctx.strokeStyle = "#ffe650";
         ctx.lineWidth = 3;
@@ -495,7 +542,6 @@
         ctx.stroke();
       }
 
-      // Vẽ Đạn Boss
       for (let bb of bossBullets) {
         ctx.fillStyle = "#ff5014";
         ctx.beginPath();
@@ -503,7 +549,6 @@
         ctx.fill();
       }
 
-      // Vẽ Quân lính người chơi
       if (mobCount > 0) {
         const clusterR = Math.min(18 + Math.sqrt(mobCount) * 3.5, 65);
         const visCount = Math.min(mobCount, 55);
@@ -513,7 +558,6 @@
           drawSoldier(playerX + d * Math.cos(ang), playerY + d * Math.sin(ang) * 0.7, true, 1.0);
         }
 
-        // Bảng đếm số lính
         ctx.fillStyle = "#141414";
         ctx.fillRect(playerX - 24, playerY - clusterR - 28, 48, 22);
         ctx.strokeStyle = "#ffffff";
@@ -525,7 +569,6 @@
         ctx.fillText(`${mobCount}`, playerX, playerY - clusterR - 12);
       }
 
-      // HUD
       ctx.fillStyle = "#19191e";
       ctx.fillRect(0, 0, SCREEN_WIDTH, 45);
       ctx.fillStyle = "#00c8ff";
@@ -534,9 +577,8 @@
       ctx.fillText(`QUÂN ĐỘI: ${mobCount}`, 20, 28);
       ctx.fillStyle = "#ffd700";
       ctx.textAlign = "right";
-      ctx.fillText(`BOSS ĐÃ DIỆT: ${bossDefeated}`, SCREEN_WIDTH - 20, 28);
+      ctx.fillText(`TRÙM ĐÃ DIỆT: ${bossDefeated}`, SCREEN_WIDTH - 20, 28);
 
-      // Màn hình Game Over
       if (gameState === "GAMEOVER") {
         ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
         ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -547,15 +589,15 @@
 
         ctx.fillStyle = "#ffd700";
         ctx.font = "bold 22px Arial";
-        ctx.fillText(`Số Boss đã diệt: ${bossDefeated}`, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+        ctx.fillText(`Số trùm đã diệt: ${bossDefeated}`, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 
         ctx.fillStyle = "#ffffff";
         ctx.font = "bold 16px Arial";
-        ctx.fillText(`Tổng điểm: ${score}`, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 35);
+        ctx.fillText(`Điểm số: ${score}`, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 35);
 
         ctx.fillStyle = "#cccccc";
         ctx.font = "14px Arial";
-        ctx.fillText("Chạm vào màn hình để hồi sinh chơi lại", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 75);
+        ctx.fillText("Chạm vào màn hình để chơi lại", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 75);
       }
     }
 
