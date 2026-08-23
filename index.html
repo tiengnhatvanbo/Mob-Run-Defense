@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Mob Run - Game Pi Network</title>
+  <title>Mob Run - Pi Network Game Pro</title>
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
   <style>
     * {
@@ -14,42 +14,65 @@
       padding: 0;
     }
     body {
-      background-color: #1a1a1a;
+      background-color: #121316;
       overflow: hidden;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
       width: 100vw;
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       position: relative;
     }
     #gameCanvas {
-      background-color: #cdc4b2;
-      box-shadow: 0 0 25px rgba(0,0,0,0.8);
+      background: linear-gradient(to bottom, #d5cebe, #bfb7a4);
+      box-shadow: 0 0 35px rgba(0,0,0,0.9);
       max-height: 100vh;
       max-width: 100vw;
       aspect-ratio: 540 / 800;
+      display: block;
     }
-    #pi-auth-container {
+
+    #top-nav {
       position: absolute;
       top: 12px;
+      left: 15px;
       right: 15px;
       z-index: 100;
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 8px;
+      pointer-events: none;
+    }
+    .interactive-btn {
+      pointer-events: auto;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      font-weight: bold;
+      border-radius: 18px;
+      padding: 6px 14px;
+      font-size: 13px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      transition: transform 0.1s;
+    }
+    .interactive-btn:active {
+      transform: scale(0.95);
+    }
+    #pause-btn {
+      background: #333946;
+      color: #fff;
+      border: 1px solid #6c7a89;
+    }
+    #shop-btn {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #fff;
+      border: 1px solid #fef08a;
     }
     #sign-in-button {
       background: #ffb703;
       color: #1a1a1a;
       border: 2px solid #ffffff;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-weight: bold;
-      font-size: 13px;
-      cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
     #user-profile {
       display: none;
@@ -60,52 +83,182 @@
       border-radius: 15px;
       font-size: 13px;
       font-weight: bold;
+      pointer-events: auto;
+    }
+
+    #shop-modal {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 380px;
+      background: rgba(24, 26, 32, 0.96);
+      border: 2px solid #ffd700;
+      border-radius: 16px;
+      padding: 20px;
+      color: #fff;
+      z-index: 200;
+      box-shadow: 0 0 30px rgba(0,0,0,0.8);
+      text-align: center;
+    }
+    .shop-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #2b303c;
+      padding: 10px 14px;
+      margin: 10px 0;
+      border-radius: 10px;
+    }
+    .shop-btn-buy {
+      background: #ffb703;
+      color: #1a1a1a;
+      border: none;
+      padding: 6px 12px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .close-shop-btn {
+      margin-top: 10px;
+      background: #475569;
+      color: #fff;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
 
-  <div id="pi-auth-container">
-    <button id="sign-in-button" onclick="signIn()">Đăng nhập Pi</button>
-    <div id="user-profile"></div>
+  <div id="top-nav">
+    <div style="display: flex; gap: 8px;">
+      <button id="pause-btn" class="interactive-btn" onclick="togglePause()">⏸ Tạm Dừng</button>
+      <button id="shop-btn" class="interactive-btn" onclick="toggleShop(true)">🛒 Shop Pi</button>
+    </div>
+    <div style="display: flex; gap: 8px; align-items: center;">
+      <button id="sign-in-button" class="interactive-btn" onclick="signIn()">Đăng nhập Pi</button>
+      <div id="user-profile"></div>
+    </div>
+  </div>
+
+  <div id="shop-modal">
+    <h2 style="color: #ffd700; margin-bottom: 12px;">CỬA HÀNG VẬT PHẨM PI</h2>
+    <div class="shop-item">
+      <div style="text-align: left;">
+        <strong>Buff Đạn Siêu Cấp</strong>
+        <div style="font-size: 11px; color: #aaa;">Gấp đôi tốc bắn & số lượng đạn</div>
+      </div>
+      <button class="shop-btn-buy" onclick="buyItem('power_buff', 0.2, 'Buff Đạn Siêu Cấp')">0.2 Pi</button>
+    </div>
+    <div class="shop-item">
+      <div style="text-align: left;">
+        <strong>Giáp Hoàng Kim (Skin VIP)</strong>
+        <div style="font-size: 11px; color: #aaa;">Đổi màu lính vàng & +10 lính viện trợ</div>
+      </div>
+      <button class="shop-btn-buy" onclick="buyItem('golden_skin', 0.5, 'Skin Hoàng Kim')">0.5 Pi</button>
+    </div>
+    <button class="close-shop-btn" onclick="toggleShop(false)">Đóng Cửa Hàng</button>
   </div>
 
   <canvas id="gameCanvas" width="540" height="800"></canvas>
 
   <script>
+    // ----------------- HỆ THỐNG ÂM THANH (WEB AUDIO API) -----------------
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'shoot') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(450, now);
+        osc.frequency.exponentialRampToValueAtTime(120, now + 0.08);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        osc.start(now);
+        osc.stop(now + 0.08);
+      } else if (type === 'gate') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(320, now);
+        osc.frequency.exponentialRampToValueAtTime(780, now + 0.15);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+        osc.start(now);
+        osc.stop(now + 0.15);
+      } else if (type === 'hit') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.exponentialRampToValueAtTime(40, now + 0.06);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
+        osc.start(now);
+        osc.stop(now + 0.06);
+      } else if (type === 'explosion') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(130, now);
+        osc.frequency.exponentialRampToValueAtTime(30, now + 0.35);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+        osc.start(now);
+        osc.stop(now + 0.35);
+      } else if (type === 'gameover') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(260, now);
+        osc.frequency.linearRampToValueAtTime(90, now + 0.6);
+        gain.gain.setValueAtTime(0.35, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+        osc.start(now);
+        osc.stop(now + 0.6);
+      }
+    }
+
+    // ----------------- PI NETWORK SDK & THANH TOÁN -----------------
     let isAuthenticating = false;
+    let currentUser = null;
+    let hasGoldenSkin = false;
+    let hasPowerBuff = false;
 
     async function initPi() {
       if (typeof window.Pi === "undefined") {
-        console.warn("Không tìm thấy Pi SDK.");
+        console.warn("Chưa tải Pi SDK.");
         return;
       }
-
       try {
         await window.Pi.init({ version: "2.0", sandbox: true });
         await signIn();
       } catch (err) {
-        console.error("Khởi tạo Pi SDK thất bại:", err);
+        console.error("Khởi tạo Pi thất bại:", err);
       }
     }
 
     async function signIn() {
       if (!window.Pi || isAuthenticating) return;
       isAuthenticating = true;
-
-      const scopes = ["username"];
+      const scopes = ["username", "payments"];
 
       function onIncompletePaymentFound(payment) {
-        console.log("Tìm thấy giao dịch chưa hoàn tất:", payment);
+        console.log("Xử lý giao dịch dang dở:", payment);
       }
 
       try {
         const authResult = await window.Pi.authenticate(scopes, onIncompletePaymentFound);
-        
+        currentUser = authResult.user;
         document.getElementById("sign-in-button").style.display = "none";
         const userProfile = document.getElementById("user-profile");
         userProfile.style.display = "block";
-        userProfile.innerText = `@${authResult.user.username}`;
+        userProfile.innerText = `@${currentUser.username}`;
       } catch (error) {
         console.error("Lỗi xác thực:", error);
       } finally {
@@ -113,9 +266,59 @@
       }
     }
 
+    function buyItem(itemType, amountPi, memoText) {
+      if (!window.Pi || !currentUser) {
+        alert("Vui lòng đăng nhập tài khoản Pi trước khi mua!");
+        return;
+      }
+
+      const paymentData = {
+        amount: amountPi,
+        memo: memoText,
+        metadata: { itemType: itemType }
+      };
+
+      const callbacks = {
+        onReadyForServerApproval: (paymentId) => {
+          console.log("Sẵn sàng duyệt Server ID:", paymentId);
+        },
+        onReadyForServerCompletion: (paymentId, txid) => {
+          console.log("Giao dịch thành công txid:", txid);
+          applyPurchasedItem(itemType);
+          toggleShop(false);
+          alert(`Thanh toán thành công! Bạn đã nhận: ${memoText}`);
+        },
+        onCancel: (paymentId) => {
+          console.log("Người dùng hủy thanh toán:", paymentId);
+        },
+        onError: (error, payment) => {
+          console.error("Lỗi thanh toán:", error);
+          alert("Giao dịch Pi thất bại.");
+        }
+      };
+
+      window.Pi.createPayment(paymentData, callbacks);
+    }
+
+    function applyPurchasedItem(itemType) {
+      if (itemType === 'power_buff') {
+        hasPowerBuff = true;
+      } else if (itemType === 'golden_skin') {
+        hasGoldenSkin = true;
+        mobCount += 10;
+      } else if (itemType === 'revive') {
+        mobCount = 20;
+        gameState = "PLAYING";
+      }
+    }
+
+    function buyRevive() {
+      buyItem('revive', 0.1, 'Hồi Sinh Nhân Vật (Mob Run)');
+    }
+
     window.addEventListener("DOMContentLoaded", initPi);
 
-    // ----------------- CƠ CHẾ VÀ ĐỒ HỌA GAME -----------------
+    // ----------------- CƠ CHẾ VÀ LOGIC GAME -----------------
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
@@ -125,10 +328,11 @@
     let playerX = SCREEN_WIDTH / 2;
     const playerY = 660;
     let mobCount = 15;
-    const scrollSpeed = 1.8;
+    let scrollSpeed = 1.8;
     let gameState = "PLAYING";
 
     let score = 0;
+    let highScore = localStorage.getItem("mobrun_highscore") || 0;
     let bossDefeated = 0;
     let currentBossLevel = 1;
 
@@ -141,7 +345,26 @@
     let particles = [];
     let shootCd = 0;
 
-    // Hiệu ứng nổ mảnh vụn khi tiêu diệt mục tiêu
+    function togglePause() {
+      if (gameState === "PLAYING") {
+        gameState = "PAUSED";
+        document.getElementById("pause-btn").innerText = "▶ Tiếp Tục";
+      } else if (gameState === "PAUSED") {
+        gameState = "PLAYING";
+        document.getElementById("pause-btn").innerText = "⏸ Tạm Dừng";
+      }
+    }
+
+    function toggleShop(show) {
+      const modal = document.getElementById("shop-modal");
+      if (show) {
+        if (gameState === "PLAYING") togglePause();
+        modal.style.display = "block";
+      } else {
+        modal.style.display = "none";
+      }
+    }
+
     function createExplosion(x, y, color = "#ffb703", count = 25) {
       for (let i = 0; i < count; i++) {
         const angle = Math.random() * Math.PI * 2;
@@ -160,8 +383,14 @@
     }
 
     function drawSoldier(x, y, isBlue = true, scale = 1.0) {
-      const bodyCol = isBlue ? "#0d47a1" : "#b71c1c";
-      const hatCol = isBlue ? "#1976d2" : "#e53935";
+      let bodyCol = isBlue ? "#0d47a1" : "#b71c1c";
+      let hatCol = isBlue ? "#1976d2" : "#e53935";
+      
+      if (isBlue && hasGoldenSkin) {
+        bodyCol = "#d97706";
+        hatCol = "#facc15";
+      }
+
       const skinCol = "#f5cdb0";
 
       ctx.fillStyle = "rgba(0,0,0,0.15)";
@@ -193,7 +422,7 @@
       ctx.ellipse(x, y + 25, 55, 20, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.fillStyle = "#c31e1e";
+      ctx.fillStyle = "#991b1b";
       ctx.beginPath();
       ctx.moveTo(x - 30, y - 10);
       ctx.lineTo(x + 30, y - 10);
@@ -237,16 +466,12 @@
         ctx.beginPath();
         ctx.arc(gunX, gunY + 44, 10, 0, Math.PI * 2);
         ctx.fill();
-        ctx.fillStyle = "#ffffff";
-        ctx.beginPath();
-        ctx.arc(gunX, gunY + 44, 5, 0, Math.PI * 2);
-        ctx.fill();
       }
 
       const hpPct = Math.max(0, hp / maxHp);
-      ctx.fillStyle = "#282828";
+      ctx.fillStyle = "#1f2937";
       ctx.fillRect(x - 52, y - 76, 104, 12);
-      ctx.fillStyle = "#ff3232";
+      ctx.fillStyle = hpPct > 0.5 ? "#22c55e" : (hpPct > 0.25 ? "#eab308" : "#ef4444");
       ctx.fillRect(x - 50, y - 74, 100 * hpPct, 8);
       ctx.strokeStyle = "#ffffff";
       ctx.lineWidth = 1;
@@ -255,14 +480,19 @@
       ctx.fillStyle = "#ffffff";
       ctx.font = "bold 12px Arial";
       ctx.textAlign = "center";
-      ctx.fillText(`TRÙM #${boss.level} MÁU: ${Math.ceil(hp)}`, x, y - 84);
+      ctx.fillText(`TRÙM #${boss.level} HP: ${Math.ceil(hp)}`, x, y - 84);
     }
 
     function spawnTrackSegment(startY, level) {
-      for (let i = 0; i < 12; i++) {
-        const gy = startY - i * 65;
-        sideGates.push({ x: 42, y: gy, w: 58, h: 32, val: 1, isLeft: true, triggered: false });
-        sideGates.push({ x: SCREEN_WIDTH - 100, y: gy, w: 58, h: 32, val: 99, isLeft: false, triggered: false });
+      const extraDiff = Math.max(0, bossDefeated - 2);
+      
+      for (let i = 0; i < 10; i++) {
+        const gy = startY - i * 75;
+        const leftVal = Math.max(1, 4 - Math.floor(extraDiff * 0.5));
+        const rightVal = Math.max(10, 50 - extraDiff * 6);
+
+        sideGates.push({ x: 42, y: gy, w: 58, h: 32, val: leftVal, isLeft: true, triggered: false });
+        sideGates.push({ x: SCREEN_WIDTH - 100, y: gy, w: 58, h: 32, val: rightVal, isLeft: false, triggered: false });
       }
 
       barricades.push({
@@ -270,10 +500,11 @@
         y: startY - 420,
         w: 190,
         h: 44,
-        hp: 120 + level * 40
+        hp: 120 + level * 50 + extraDiff * 60
       });
 
-      for (let row = 0; row < 20; row++) {
+      const enemyRows = Math.min(28, 16 + level * 2 + extraDiff * 3);
+      for (let row = 0; row < enemyRows; row++) {
         for (let col = 0; col < 8; col++) {
           redEnemies.push({
             x: SCREEN_WIDTH / 2 - 75 + col * 20 + (Math.random() * 8 - 4),
@@ -283,15 +514,16 @@
         }
       }
 
+      const bossHp = 100 + level * 50 + extraDiff * 90;
       bosses.push({
         x: SCREEN_WIDTH / 2,
         y: startY - 1100,
         level: level,
-        hp: 80 + level * 35,
-        maxHp: 80 + level * 35,
+        hp: bossHp,
+        maxHp: bossHp,
         shootTimer: 0,
         moveDir: 1,
-        attackRate: Math.max(40, 85 - level * 3),
+        attackRate: Math.max(25, 75 - level * 4 - extraDiff * 6),
         flashTimer: 0
       });
     }
@@ -302,6 +534,7 @@
       score = 0;
       bossDefeated = 0;
       currentBossLevel = 1;
+      scrollSpeed = 1.8;
       bullets = [];
       bossBullets = [];
       sideGates = [];
@@ -316,8 +549,8 @@
     initGame();
 
     let isDragging = false;
-
     function handlePointer(clientX) {
+      if (gameState !== "PLAYING") return;
       const rect = canvas.getBoundingClientRect();
       const scaleX = canvas.width / rect.width;
       playerX = (clientX - rect.left) * scaleX;
@@ -345,25 +578,32 @@
     function update() {
       if (gameState === "PLAYING") {
         score++;
+        if (score > highScore) {
+          highScore = score;
+          localStorage.setItem("mobrun_highscore", highScore);
+        }
 
-        // Tự động sản sinh chặng tiếp theo
+        scrollSpeed = 1.8 + Math.min(2.0, bossDefeated * 0.25);
+
         if (bosses.length === 0 || bosses[bosses.length - 1].y > -500) {
           currentBossLevel++;
           spawnTrackSegment(-300, currentBossLevel);
         }
 
-        // Tự động bắn đạn lính
+        const shootInterval = hasPowerBuff ? 2 : 3;
         shootCd++;
-        if (shootCd >= 3) {
+        if (shootCd >= shootInterval) {
           shootCd = 0;
-          const guns = Math.floor(Math.min(12, Math.max(2, mobCount / 6)));
+          let guns = Math.floor(Math.min(14, Math.max(2, mobCount / 5)));
+          if (hasPowerBuff) guns = Math.min(18, guns + 4);
+
           for (let g = 0; g < guns; g++) {
             const ox = (g - (guns - 1) / 2) * 8;
-            bullets.push({ x: playerX + ox, y: playerY - 25, speed: 16 });
+            bullets.push({ x: playerX + ox, y: playerY - 25, speed: 17 });
           }
+          playSound('shoot');
         }
 
-        // Cập nhật hiệu ứng nổ (particles)
         for (let i = particles.length - 1; i >= 0; i--) {
           const p = particles[i];
           p.x += p.vx;
@@ -372,7 +612,6 @@
           if (p.alpha <= 0) particles.splice(i, 1);
         }
 
-        // Cập nhật đạn của lính
         for (let i = bullets.length - 1; i >= 0; i--) {
           const b = bullets[i];
           b.y -= b.speed;
@@ -381,7 +620,8 @@
           let hit = false;
           for (let bar of barricades) {
             if (bar.hp > 0 && b.x >= bar.x && b.x <= bar.x + bar.w && b.y >= bar.y && b.y <= bar.y + bar.h) {
-              bar.hp -= 1.5;
+              bar.hp -= (hasPowerBuff ? 3.0 : 1.5);
+              playSound('hit');
               if (bar.hp <= 0) createExplosion(bar.x + bar.w / 2, bar.y + bar.h / 2, "#8c8e94", 20);
               hit = true;
               break;
@@ -392,24 +632,25 @@
           for (let e of redEnemies) {
             if (e.alive && Math.hypot(e.x - b.x, e.y - b.y) < 14) {
               e.alive = false;
-              createExplosion(e.x, e.y, "#b71c1c", 10);
+              createExplosion(e.x, e.y, "#b71c1c", 8);
+              playSound('hit');
               hit = true;
               break;
             }
           }
           if (hit) { bullets.splice(i, 1); continue; }
 
-          // Bắn trúng Boss
           for (let j = bosses.length - 1; j >= 0; j--) {
             const boss = bosses[j];
-            if (Math.hypot(boss.x - b.x, boss.y - b.y) < 48) {
-              boss.hp -= 3.5;
+            if (Math.hypot(boss.x - b.x, boss.y - b.y) < 50) {
+              boss.hp -= (hasPowerBuff ? 6.5 : 3.5);
+              playSound('hit');
               
-              // NẾU BOSS HẾT MÁU -> NỔ VÀ TỰ ĐỘNG BIẾN MẤT LẬP TỨC
               if (boss.hp <= 0) {
-                createExplosion(boss.x, boss.y, "#ff3232", 40);
-                createExplosion(boss.x, boss.y - 30, "#ffe650", 25);
-                bosses.splice(j, 1); // Xóa sổ hoàn toàn khỏi màn chơi
+                createExplosion(boss.x, boss.y, "#ff3232", 45);
+                createExplosion(boss.x, boss.y - 30, "#ffe650", 30);
+                playSound('explosion');
+                bosses.splice(j, 1);
                 bossDefeated++;
               }
               hit = true;
@@ -419,12 +660,12 @@
           if (hit) { bullets.splice(i, 1); continue; }
         }
 
-        // Cập nhật hoạt động của Boss
+        // Cập nhật Boss Lớn
         for (let i = bosses.length - 1; i >= 0; i--) {
           const boss = bosses[i];
           boss.y += scrollSpeed;
-          boss.x += boss.moveDir * 1.0;
-          if (boss.x < 160 || boss.x > SCREEN_WIDTH - 160) boss.moveDir *= -1;
+          boss.x += boss.moveDir * (1.0 + Math.min(1.5, bossDefeated * 0.15));
+          if (boss.x < 150 || boss.x > SCREEN_WIDTH - 150) boss.moveDir *= -1;
 
           if (boss.flashTimer > 0) boss.flashTimer--;
 
@@ -437,27 +678,34 @@
               bossBullets.push({
                 x: boss.x + 18,
                 y: boss.y + 35,
-                vx: Math.cos(angle) * 4.5,
-                vy: Math.sin(angle) * 4.5
+                vx: Math.cos(angle) * (4.5 + Math.min(2.5, bossDefeated * 0.2)),
+                vy: Math.sin(angle) * (4.5 + Math.min(2.5, bossDefeated * 0.2))
               });
             }
           }
 
-          // Va chạm trực tiếp giữa người chơi và Boss
           if (Math.hypot(playerX - boss.x, playerY - boss.y) < 70) {
-            boss.hp -= 8;
-            mobCount = Math.max(0, mobCount - 2);
+            boss.hp -= 10;
+            mobCount = Math.max(0, mobCount - 3);
             if (boss.hp <= 0) {
-              createExplosion(boss.x, boss.y, "#ff3232", 40);
+              createExplosion(boss.x, boss.y, "#ff3232", 45);
+              playSound('explosion');
               bosses.splice(i, 1);
               bossDefeated++;
               continue;
             }
           }
-          if (boss.y > SCREEN_HEIGHT + 150) bosses.splice(i, 1);
+
+          // BOSS LỚN RƠI KHỎI MÀN HÌNH -> TRỪ 10 MÁU
+          if (boss.y > SCREEN_HEIGHT + 100) {
+            mobCount = Math.max(0, mobCount - 10);
+            createExplosion(playerX, playerY, "#ef4444", 25);
+            playSound('hit');
+            bosses.splice(i, 1);
+          }
         }
 
-        // Đạn của Boss
+        // Cập nhật đạn của Boss
         for (let i = bossBullets.length - 1; i >= 0; i--) {
           const bb = bossBullets[i];
           bb.x += bb.vx;
@@ -466,6 +714,7 @@
           if (Math.hypot(playerX - bb.x, playerY - bb.y) < 30) {
             mobCount = Math.max(0, mobCount - 3);
             createExplosion(bb.x, bb.y, "#ff5014", 12);
+            playSound('hit');
             bossBullets.splice(i, 1);
             continue;
           }
@@ -474,13 +723,14 @@
           }
         }
 
-        // Cổng
+        // Cổng cấp số
         for (let i = sideGates.length - 1; i >= 0; i--) {
           const g = sideGates[i];
           g.y += scrollSpeed;
           if (!g.triggered && playerX >= g.x && playerX <= g.x + g.w && playerY >= g.y && playerY <= g.y + g.h) {
             mobCount += g.val;
             g.triggered = true;
+            playSound('gate');
           }
           if (g.y > SCREEN_HEIGHT + 50) sideGates.splice(i, 1);
         }
@@ -493,26 +743,39 @@
             const dmg = Math.min(bar.hp, mobCount);
             mobCount = Math.max(0, mobCount - dmg);
             bar.hp -= dmg;
+            playSound('hit');
             if (bar.hp <= 0) createExplosion(bar.x + bar.w / 2, bar.y + bar.h / 2, "#8c8e94", 20);
           }
           if (bar.y > SCREEN_HEIGHT + 50) barricades.splice(i, 1);
         }
 
-        // Lính đỏ
+        // Cập nhật Boss Nhỏ (Lính đỏ)
         for (let i = redEnemies.length - 1; i >= 0; i--) {
           const e = redEnemies[i];
           e.y += scrollSpeed;
+
           if (e.alive && Math.hypot(playerX - e.x, playerY - e.y) < 25) {
             e.alive = false;
             mobCount = Math.max(0, mobCount - 1);
             createExplosion(e.x, e.y, "#b71c1c", 8);
+            playSound('hit');
           }
-          if (e.y > SCREEN_HEIGHT + 50) redEnemies.splice(i, 1);
+
+          // BOSS NHỎ RƠI KHỎI MÀN HÌNH KHI CHƯA BỊ DIỆT -> TRỪ 1 MÁU
+          if (e.y > SCREEN_HEIGHT + 30) {
+            if (e.alive) {
+              mobCount = Math.max(0, mobCount - 1);
+              createExplosion(playerX, playerY, "#ff3232", 6);
+              playSound('hit');
+            }
+            redEnemies.splice(i, 1);
+          }
         }
 
         if (mobCount <= 0) {
           mobCount = 0;
           gameState = "GAMEOVER";
+          playSound('gameover');
         }
       }
     }
@@ -520,16 +783,14 @@
     function draw() {
       ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-      // Mặt đường
-      ctx.fillStyle = "#b9bbc0";
+      ctx.fillStyle = "#a8abb2";
       ctx.fillRect(35, 0, SCREEN_WIDTH - 70, SCREEN_HEIGHT);
-      ctx.strokeStyle = "#8c8e94";
+      ctx.strokeStyle = "#64748b";
       ctx.lineWidth = 4;
       ctx.strokeRect(35, 0, SCREEN_WIDTH - 70, SCREEN_HEIGHT);
 
-      // Vẽ Cổng
       for (let g of sideGates) {
-        ctx.fillStyle = g.isLeft ? "#2196f3" : "#ffd600";
+        ctx.fillStyle = g.isLeft ? "#0284c7" : "#eab308";
         ctx.fillRect(g.x, g.y, g.w, g.h);
         ctx.strokeStyle = "#ffffff";
         ctx.lineWidth = 2;
@@ -540,10 +801,9 @@
         ctx.fillText(`+${g.val}`, g.x + g.w / 2, g.y + 22);
       }
 
-      // Vẽ Rào chắn
       for (let bar of barricades) {
         if (bar.hp > 0) {
-          ctx.fillStyle = "#5a5f64";
+          ctx.fillStyle = "#475569";
           ctx.fillRect(bar.x, bar.y, bar.w, bar.h);
           ctx.fillStyle = "#ffffff";
           ctx.font = "bold 20px Arial";
@@ -552,21 +812,18 @@
         }
       }
 
-      // Vẽ Lính đỏ
       for (let e of redEnemies) {
         if (e.alive && e.y > -20 && e.y < SCREEN_HEIGHT + 20) {
           drawSoldier(e.x, e.y, false, 0.9);
         }
       }
 
-      // Vẽ Boss 3D
       for (let boss of bosses) {
         if (boss.y > -120 && boss.y < SCREEN_HEIGHT + 100) {
           drawBoss3D(boss);
         }
       }
 
-      // Vẽ hiệu ứng hạt nổ
       for (let p of particles) {
         ctx.save();
         ctx.globalAlpha = Math.max(0, p.alpha);
@@ -577,25 +834,22 @@
         ctx.restore();
       }
 
-      // Đạn của người chơi
       for (let b of bullets) {
-        ctx.strokeStyle = "#ffe650";
-        ctx.lineWidth = 3;
+        ctx.strokeStyle = hasPowerBuff ? "#f43f5e" : "#fde047";
+        ctx.lineWidth = hasPowerBuff ? 4 : 3;
         ctx.beginPath();
         ctx.moveTo(b.x, b.y);
-        ctx.lineTo(b.x, b.y - 10);
+        ctx.lineTo(b.x, b.y - 12);
         ctx.stroke();
       }
 
-      // Đạn của Boss
       for (let bb of bossBullets) {
-        ctx.fillStyle = "#ff5014";
+        ctx.fillStyle = "#ea580c";
         ctx.beginPath();
         ctx.arc(bb.x, bb.y, 6, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      // Tiểu đội lính xanh
       if (mobCount > 0) {
         const clusterR = Math.min(18 + Math.sqrt(mobCount) * 3.5, 65);
         const visCount = Math.min(mobCount, 55);
@@ -605,50 +859,86 @@
           drawSoldier(playerX + d * Math.cos(ang), playerY + d * Math.sin(ang) * 0.7, true, 1.0);
         }
 
-        ctx.fillStyle = "#141414";
-        ctx.fillRect(playerX - 24, playerY - clusterR - 28, 48, 22);
-        ctx.strokeStyle = "#ffffff";
-        ctx.lineWidth = 1;
-        ctx.strokeRect(playerX - 24, playerY - clusterR - 28, 48, 22);
-        ctx.fillStyle = "#ffffff";
+        ctx.fillStyle = "#0f172a";
+        ctx.fillRect(playerX - 25, playerY - clusterR - 28, 50, 22);
+        ctx.strokeStyle = hasGoldenSkin ? "#ffd700" : "#ffffff";
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(playerX - 25, playerY - clusterR - 28, 50, 22);
+        ctx.fillStyle = hasGoldenSkin ? "#ffd700" : "#ffffff";
         ctx.font = "bold 14px Arial";
         ctx.textAlign = "center";
         ctx.fillText(`${mobCount}`, playerX, playerY - clusterR - 12);
       }
 
-      // Thanh HUD
-      ctx.fillStyle = "#19191e";
-      ctx.fillRect(0, 0, SCREEN_WIDTH, 45);
-      ctx.fillStyle = "#00c8ff";
-      ctx.font = "bold 16px Arial";
+      ctx.fillStyle = "rgba(15, 23, 42, 0.95)";
+      ctx.fillRect(0, 0, SCREEN_WIDTH, 48);
+      
+      ctx.fillStyle = "#38bdf8";
+      ctx.font = "bold 15px Arial";
       ctx.textAlign = "left";
-      ctx.fillText(`QUÂN ĐỘI: ${mobCount}`, 20, 28);
-      ctx.fillStyle = "#ffd700";
+      ctx.fillText(`LÍNH: ${mobCount}`, 15, 30);
+
+      ctx.fillStyle = "#facc15";
+      ctx.textAlign = "center";
+      ctx.fillText(`DIỆT: ${bossDefeated} 💀`, SCREEN_WIDTH / 2, 30);
+
+      ctx.fillStyle = "#cbd5e1";
       ctx.textAlign = "right";
-      ctx.fillText(`TRÙM ĐÃ DIỆT: ${bossDefeated}`, SCREEN_WIDTH - 20, 28);
+      ctx.fillText(`KỶ LỤC: ${highScore}`, SCREEN_WIDTH - 15, 30);
 
-      // Màn hình Game Over
-      if (gameState === "GAMEOVER") {
-        ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
+      if (gameState === "PAUSED") {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.65)";
         ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-        ctx.fillStyle = "#ff3232";
-        ctx.font = "bold 32px Arial";
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 30px Arial";
         ctx.textAlign = "center";
-        ctx.fillText("BẠN ĐÃ TỬ TRẬN!", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 50);
+        ctx.fillText("TRÒ CHƠI TẠM DỪNG", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+      }
 
-        ctx.fillStyle = "#ffd700";
-        ctx.font = "bold 22px Arial";
-        ctx.fillText(`Số trùm đã diệt: ${bossDefeated}`, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+      if (gameState === "GAMEOVER") {
+        ctx.fillStyle = "rgba(10, 10, 15, 0.88)";
+        ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+        ctx.fillStyle = "#ef4444";
+        ctx.font = "bold 34px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("BẠN ĐÃ THẤT THỦ!", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 80);
+
+        ctx.fillStyle = "#facc15";
+        ctx.font = "bold 20px Arial";
+        ctx.fillText(`Trùm đã diệt: ${bossDefeated}`, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 30);
 
         ctx.fillStyle = "#ffffff";
         ctx.font = "bold 16px Arial";
-        ctx.fillText(`Điểm số: ${score}`, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 35);
+        ctx.fillText(`Điểm trận này: ${score}`, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 5);
+        ctx.fillText(`Điểm kỷ lục: ${highScore}`, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 30);
 
-        ctx.fillStyle = "#cccccc";
+        ctx.fillStyle = "#ffb703";
+        ctx.fillRect(SCREEN_WIDTH / 2 - 110, SCREEN_HEIGHT / 2 + 65, 220, 42);
+        ctx.fillStyle = "#000000";
+        ctx.font = "bold 15px Arial";
+        ctx.fillText("HỒI SINH (0.1 Pi)", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 91);
+
+        ctx.fillStyle = "#94a3b8";
         ctx.font = "14px Arial";
-        ctx.fillText("Chạm vào màn hình để chơi lại", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 75);
+        ctx.fillText("Chạm bất kỳ đâu bên ngoài để chơi lại từ đầu", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 135);
       }
     }
+
+    canvas.addEventListener("click", (e) => {
+      if (gameState === "GAMEOVER") {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const cx = (e.clientX - rect.left) * scaleX;
+        const cy = (e.clientY - rect.top) * scaleY;
+
+        if (cx >= SCREEN_WIDTH / 2 - 110 && cx <= SCREEN_WIDTH / 2 + 110 &&
+            cy >= SCREEN_HEIGHT / 2 + 65 && cy <= SCREEN_HEIGHT / 2 + 107) {
+          buyRevive();
+        }
+      }
+    });
 
     function gameLoop() {
       update();
