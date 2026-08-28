@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Mob Run - Pi Network Game Pro</title>
+  <title>Mob Run & Medieval Castle Gate Defense 3D</title>
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
   <style>
     * {
@@ -14,7 +14,7 @@
       padding: 0;
     }
     body {
-      background-color: #121316;
+      background-color: #080a10;
       overflow: hidden;
       display: flex;
       justify-content: center;
@@ -25,12 +25,13 @@
       position: relative;
     }
     #gameCanvas {
-      background: linear-gradient(to bottom, #d5cebe, #bfb7a4);
-      box-shadow: 0 0 35px rgba(0,0,0,0.9);
+      background: radial-gradient(circle at 50% 30%, #1e293b, #090d16);
+      box-shadow: 0 0 50px rgba(0,0,0,0.95);
       max-height: 100vh;
       max-width: 100vw;
       aspect-ratio: 540 / 800;
       display: block;
+      cursor: crosshair;
     }
 
     #top-nav {
@@ -51,39 +52,84 @@
       outline: none;
       font-weight: bold;
       border-radius: 18px;
-      padding: 6px 14px;
+      padding: 7px 15px;
       font-size: 13px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
       transition: transform 0.1s;
     }
     .interactive-btn:active {
-      transform: scale(0.95);
+      transform: scale(0.92);
     }
     #pause-btn {
-      background: #333946;
-      color: #fff;
-      border: 1px solid #6c7a89;
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid #475569;
     }
     #shop-btn {
-      background: linear-gradient(135deg, #f59e0b, #d97706);
+      background: linear-gradient(135deg, #f59e0b, #b45309);
       color: #fff;
-      border: 1px solid #fef08a;
+      border: 1px solid #fde047;
     }
     #sign-in-button {
-      background: #ffb703;
-      color: #1a1a1a;
+      background: #eab308;
+      color: #0f172a;
       border: 2px solid #ffffff;
     }
     #user-profile {
       display: none;
-      background: rgba(20, 20, 30, 0.85);
-      color: #ffd700;
-      border: 1px solid #ffd700;
-      padding: 5px 12px;
+      background: rgba(15, 23, 42, 0.9);
+      color: #facc15;
+      border: 1px solid #facc15;
+      padding: 6px 14px;
       border-radius: 15px;
       font-size: 13px;
       font-weight: bold;
       pointer-events: auto;
+    }
+
+    #mode-modal {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 410px;
+      background: rgba(15, 23, 42, 0.98);
+      border: 2px solid #38bdf8;
+      border-radius: 20px;
+      padding: 24px;
+      color: #fff;
+      z-index: 300;
+      box-shadow: 0 0 50px rgba(56, 189, 248, 0.3);
+      text-align: center;
+    }
+    .mode-btn {
+      background: linear-gradient(135deg, #1e293b, #334155);
+      border: 1.5px solid #64748b;
+      border-radius: 14px;
+      padding: 14px;
+      margin: 10px 0;
+      color: #fff;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+    }
+    .mode-btn:hover {
+      border-color: #38bdf8;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+    }
+    .mode-btn strong {
+      display: block;
+      font-size: 16px;
+      margin-bottom: 4px;
+      color: #facc15;
+    }
+    .mode-btn span {
+      font-size: 12px;
+      color: #94a3b8;
     }
 
     #shop-modal {
@@ -94,39 +140,40 @@
       transform: translate(-50%, -50%);
       width: 90%;
       max-width: 380px;
-      background: rgba(24, 26, 32, 0.96);
-      border: 2px solid #ffd700;
-      border-radius: 16px;
-      padding: 20px;
+      background: rgba(15, 23, 42, 0.98);
+      border: 2px solid #facc15;
+      border-radius: 18px;
+      padding: 22px;
       color: #fff;
       z-index: 200;
-      box-shadow: 0 0 30px rgba(0,0,0,0.8);
+      box-shadow: 0 0 40px rgba(0,0,0,0.9);
       text-align: center;
     }
     .shop-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #2b303c;
-      padding: 10px 14px;
-      margin: 10px 0;
-      border-radius: 10px;
+      background: #1e293b;
+      padding: 12px 14px;
+      margin: 12px 0;
+      border-radius: 12px;
+      border: 1px solid #334155;
     }
     .shop-btn-buy {
-      background: #ffb703;
-      color: #1a1a1a;
+      background: #facc15;
+      color: #0f172a;
       border: none;
-      padding: 6px 12px;
+      padding: 8px 14px;
       font-weight: bold;
       border-radius: 8px;
       cursor: pointer;
     }
     .close-shop-btn {
-      margin-top: 10px;
+      margin-top: 12px;
       background: #475569;
       color: #fff;
       border: none;
-      padding: 8px 20px;
+      padding: 9px 24px;
       border-radius: 20px;
       cursor: pointer;
       font-weight: bold;
@@ -146,21 +193,36 @@
     </div>
   </div>
 
+  <div id="mode-modal">
+    <h2 style="color: #38bdf8; margin-bottom: 6px;">CHỌN CHẾ ĐỘ CHIẾN ĐẤU</h2>
+    <p style="font-size: 12px; color: #94a3b8; margin-bottom: 14px;">Chọn phong cách đồ hoạ và cơ chế bắn</p>
+    
+    <div class="mode-btn" onclick="startSelectedMode('RUNNER')">
+      <strong>🏃 Chế Độ 1: Chạy Vượt Ải (BẮN TỰ ĐỘNG)</strong>
+      <span>Tự động xả đạn liên hồi, nhặt cổng nhân quân số, vượt ải và săn Golem.</span>
+    </div>
+
+    <div class="mode-btn" onclick="startSelectedMode('GATE_DEFENSE')">
+      <strong>🏰 Chế Độ 2: Thủ Thành Cổng Cổ 3D</strong>
+      <span>Đứng trước cổng thành cổ 3D mở hé, nhấp bắn đẩy lùi. Diệt lính +1, diệt Boss +15 lính!</span>
+    </div>
+  </div>
+
   <div id="shop-modal">
-    <h2 style="color: #ffd700; margin-bottom: 12px;">CỬA HÀNG VẬT PHẨM PI</h2>
+    <h2 style="color: #facc15; margin-bottom: 12px;">CỬA HÀNG VẬT PHẨM PI</h2>
     <div class="shop-item">
       <div style="text-align: left;">
-        <strong>Buff Đạn Siêu Cấp</strong>
-        <div style="font-size: 11px; color: #aaa;">Gấp đôi tốc bắn & số lượng đạn</div>
+        <strong>Đạn Plasma Cực Đại</strong>
+        <div style="font-size: 11px; color: #94a3b8;">Đạn to hơn, tăng sát thương x2</div>
       </div>
-      <button class="shop-btn-buy" onclick="buyItem('power_buff', 0.2, 'Buff Đạn Siêu Cấp')">0.2 Pi</button>
+      <button class="shop-btn-buy" onclick="buyItem('power_buff', 0.2, 'Buff Đạn Plasma')">0.2 Pi</button>
     </div>
     <div class="shop-item">
       <div style="text-align: left;">
-        <strong>Giáp Hoàng Kim (Skin VIP)</strong>
-        <div style="font-size: 11px; color: #aaa;">Đổi màu lính vàng & +10 lính viện trợ</div>
+        <strong>Giáp Hoàng Kim 3D (Skin VIP)</strong>
+        <div style="font-size: 11px; color: #94a3b8;">Skin giáp vàng kim 3D & +10 chiến binh</div>
       </div>
-      <button class="shop-btn-buy" onclick="buyItem('golden_skin', 0.5, 'Skin Hoàng Kim')">0.5 Pi</button>
+      <button class="shop-btn-buy" onclick="buyItem('golden_skin', 0.5, 'Skin Giáp Hoàng Kim')">0.5 Pi</button>
     </div>
     <button class="close-shop-btn" onclick="toggleShop(false)">Đóng Cửa Hàng</button>
   </div>
@@ -168,13 +230,10 @@
   <canvas id="gameCanvas" width="540" height="800"></canvas>
 
   <script>
-    // ----------------- HỆ THỐNG ÂM THANH (WEB AUDIO API) -----------------
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     function playSound(type) {
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
       const now = audioCtx.currentTime;
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
@@ -182,41 +241,41 @@
       gain.connect(audioCtx.destination);
 
       if (type === 'shoot') {
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(450, now);
-        osc.frequency.exponentialRampToValueAtTime(120, now + 0.08);
-        gain.gain.setValueAtTime(0.08, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(560, now);
+        osc.frequency.exponentialRampToValueAtTime(140, now + 0.07);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
         osc.start(now);
-        osc.stop(now + 0.08);
+        osc.stop(now + 0.07);
       } else if (type === 'gate') {
         osc.type = 'sine';
         osc.frequency.setValueAtTime(320, now);
-        osc.frequency.exponentialRampToValueAtTime(780, now + 0.15);
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+        osc.frequency.exponentialRampToValueAtTime(950, now + 0.22);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
         osc.start(now);
-        osc.stop(now + 0.15);
+        osc.stop(now + 0.22);
       } else if (type === 'hit') {
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.setValueAtTime(140, now);
         osc.frequency.exponentialRampToValueAtTime(40, now + 0.06);
-        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.setValueAtTime(0.15, now);
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
         osc.start(now);
         osc.stop(now + 0.06);
       } else if (type === 'explosion') {
         osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(130, now);
-        osc.frequency.exponentialRampToValueAtTime(30, now + 0.35);
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+        osc.frequency.setValueAtTime(110, now);
+        osc.frequency.exponentialRampToValueAtTime(20, now + 0.45);
+        gain.gain.setValueAtTime(0.35, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
         osc.start(now);
-        osc.stop(now + 0.35);
+        osc.stop(now + 0.45);
       } else if (type === 'gameover') {
         osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(260, now);
-        osc.frequency.linearRampToValueAtTime(90, now + 0.6);
+        osc.frequency.setValueAtTime(240, now);
+        osc.frequency.linearRampToValueAtTime(70, now + 0.6);
         gain.gain.setValueAtTime(0.35, now);
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
         osc.start(now);
@@ -224,17 +283,13 @@
       }
     }
 
-    // ----------------- PI NETWORK SDK & THANH TOÁN -----------------
     let isAuthenticating = false;
     let currentUser = null;
     let hasGoldenSkin = false;
     let hasPowerBuff = false;
 
     async function initPi() {
-      if (typeof window.Pi === "undefined") {
-        console.warn("Chưa tải Pi SDK.");
-        return;
-      }
+      if (typeof window.Pi === "undefined") return;
       try {
         await window.Pi.init({ version: "2.0", sandbox: true });
         await signIn();
@@ -246,21 +301,15 @@
     async function signIn() {
       if (!window.Pi || isAuthenticating) return;
       isAuthenticating = true;
-      const scopes = ["username", "payments"];
-
-      function onIncompletePaymentFound(payment) {
-        console.log("Xử lý giao dịch dang dở:", payment);
-      }
-
       try {
-        const authResult = await window.Pi.authenticate(scopes, onIncompletePaymentFound);
+        const authResult = await window.Pi.authenticate(["username", "payments"], (p) => console.log(p));
         currentUser = authResult.user;
         document.getElementById("sign-in-button").style.display = "none";
         const userProfile = document.getElementById("user-profile");
         userProfile.style.display = "block";
         userProfile.innerText = `@${currentUser.username}`;
       } catch (error) {
-        console.error("Lỗi xác thực:", error);
+        console.error("Lỗi đăng nhập:", error);
       } finally {
         isAuthenticating = false;
       }
@@ -271,70 +320,49 @@
         alert("Vui lòng đăng nhập tài khoản Pi trước khi mua!");
         return;
       }
-
-      const paymentData = {
+      window.Pi.createPayment({
         amount: amountPi,
         memo: memoText,
         metadata: { itemType: itemType }
-      };
-
-      const callbacks = {
-        onReadyForServerApproval: (paymentId) => {
-          console.log("Sẵn sàng duyệt Server ID:", paymentId);
-        },
-        onReadyForServerCompletion: (paymentId, txid) => {
-          console.log("Giao dịch thành công txid:", txid);
+      }, {
+        onReadyForServerApproval: (pid) => console.log("Approval:", pid),
+        onReadyForServerCompletion: (pid, txid) => {
           applyPurchasedItem(itemType);
           toggleShop(false);
-          alert(`Thanh toán thành công! Bạn đã nhận: ${memoText}`);
+          alert(`Đã nhận: ${memoText}`);
         },
-        onCancel: (paymentId) => {
-          console.log("Người dùng hủy thanh toán:", paymentId);
-        },
-        onError: (error, payment) => {
-          console.error("Lỗi thanh toán:", error);
-          alert("Giao dịch Pi thất bại.");
-        }
-      };
-
-      window.Pi.createPayment(paymentData, callbacks);
+        onCancel: () => {},
+        onError: () => alert("Giao dịch Pi thất bại.")
+      });
     }
 
     function applyPurchasedItem(itemType) {
-      if (itemType === 'power_buff') {
-        hasPowerBuff = true;
-      } else if (itemType === 'golden_skin') {
-        hasGoldenSkin = true;
-        mobCount += 10;
-      } else if (itemType === 'revive') {
-        mobCount = 20;
-        gameState = "PLAYING";
-      }
-    }
-
-    function buyRevive() {
-      buyItem('revive', 0.1, 'Hồi Sinh Nhân Vật (Mob Run)');
+      if (itemType === 'power_buff') hasPowerBuff = true;
+      else if (itemType === 'golden_skin') { hasGoldenSkin = true; mobCount += 10; }
+      else if (itemType === 'revive') { mobCount = 20; gameState = "PLAYING"; }
     }
 
     window.addEventListener("DOMContentLoaded", initPi);
 
-    // ----------------- CƠ CHẾ VÀ LOGIC GAME -----------------
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
     const SCREEN_WIDTH = 540;
     const SCREEN_HEIGHT = 800;
 
+    let selectedGameMode = "MENU";
     let playerX = SCREEN_WIDTH / 2;
-    const playerY = 660;
+    const playerY = 670;
     let mobCount = 15;
     let scrollSpeed = 1.8;
-    let gameState = "PLAYING";
+    let gameState = "MENU";
 
     let score = 0;
-    let highScore = localStorage.getItem("mobrun_highscore") || 0;
+    let highScore = localStorage.getItem("mobrun_golem_highscore") || 0;
     let bossDefeated = 0;
     let currentBossLevel = 1;
+    let gameTick = 0;
+    let autoShootTimer = 0;
 
     let bullets = [];
     let bossBullets = [];
@@ -343,7 +371,14 @@
     let redEnemies = [];
     let bosses = [];
     let particles = [];
-    let shootCd = 0;
+    let floatingTexts = [];
+    let shockwaves = [];
+
+    function startSelectedMode(mode) {
+      selectedGameMode = mode;
+      document.getElementById("mode-modal").style.display = "none";
+      initGame();
+    }
 
     function togglePause() {
       if (gameState === "PLAYING") {
@@ -370,11 +405,10 @@
         const angle = Math.random() * Math.PI * 2;
         const speed = Math.random() * 6 + 2;
         particles.push({
-          x: x,
-          y: y,
+          x: x, y: y,
           vx: Math.cos(angle) * speed,
           vy: Math.sin(angle) * speed,
-          radius: Math.random() * 5 + 3,
+          radius: Math.random() * 5 + 2,
           color: color,
           alpha: 1.0,
           decay: Math.random() * 0.03 + 0.02
@@ -382,150 +416,430 @@
       }
     }
 
-    function drawSoldier(x, y, isBlue = true, scale = 1.0) {
-      let bodyCol = isBlue ? "#0d47a1" : "#b71c1c";
-      let hatCol = isBlue ? "#1976d2" : "#e53935";
-      
-      if (isBlue && hasGoldenSkin) {
-        bodyCol = "#d97706";
-        hatCol = "#facc15";
-      }
-
-      const skinCol = "#f5cdb0";
-
-      ctx.fillStyle = "rgba(0,0,0,0.15)";
-      ctx.beginPath();
-      ctx.ellipse(x, y + 6 * scale, 6 * scale, 3 * scale, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = bodyCol;
-      ctx.beginPath();
-      ctx.arc(x, y + 3 * scale, 5 * scale, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = skinCol;
-      ctx.beginPath();
-      ctx.arc(x, y - 1 * scale, 4 * scale, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = hatCol;
-      ctx.beginPath();
-      ctx.ellipse(x, y - 3 * scale, 4 * scale, 3 * scale, 0, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    function drawBoss3D(boss) {
-      const { x, y, hp, maxHp, flashTimer } = boss;
-
-      ctx.fillStyle = "rgba(0,0,0,0.25)";
-      ctx.beginPath();
-      ctx.ellipse(x, y + 25, 55, 20, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = "#991b1b";
-      ctx.beginPath();
-      ctx.moveTo(x - 30, y - 10);
-      ctx.lineTo(x + 30, y - 10);
-      ctx.lineTo(x + 22, y + 25);
-      ctx.lineTo(x - 22, y + 25);
-      ctx.closePath();
-      ctx.fill();
-
-      ctx.fillStyle = "#ffbe8c";
-      ctx.beginPath();
-      ctx.ellipse(x - 38, y + 2, 11, 16, 0, 0, Math.PI * 2);
-      ctx.ellipse(x + 38, y + 2, 11, 16, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.arc(x, y - 28, 17, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = "#ff0000";
-      ctx.beginPath();
-      ctx.arc(x - 6, y - 28, 3, 0, Math.PI * 2);
-      ctx.arc(x + 6, y - 28, 3, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = "#ffe650";
-      ctx.beginPath();
-      ctx.arc(x, y - 38, 15, 0, Math.PI * 2);
-      ctx.fill();
-
-      const gunX = x + 18;
-      const gunY = y + 5;
-      ctx.fillStyle = "#2d3237";
-      ctx.fillRect(gunX - 10, gunY - 10, 20, 22);
-      ctx.fillStyle = "#191c1e";
-      ctx.fillRect(gunX - 7, gunY + 12, 4, 25);
-      ctx.fillRect(gunX - 2, gunY + 12, 4, 27);
-      ctx.fillRect(gunX + 3, gunY + 12, 4, 25);
-
-      if (flashTimer > 0) {
-        ctx.fillStyle = "#ffe650";
-        ctx.beginPath();
-        ctx.arc(gunX, gunY + 44, 10, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      const hpPct = Math.max(0, hp / maxHp);
-      ctx.fillStyle = "#1f2937";
-      ctx.fillRect(x - 52, y - 76, 104, 12);
-      ctx.fillStyle = hpPct > 0.5 ? "#22c55e" : (hpPct > 0.25 ? "#eab308" : "#ef4444");
-      ctx.fillRect(x - 50, y - 74, 100 * hpPct, 8);
-      ctx.strokeStyle = "#ffffff";
-      ctx.lineWidth = 1;
-      ctx.strokeRect(x - 52, y - 76, 104, 12);
-
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 12px Arial";
-      ctx.textAlign = "center";
-      ctx.fillText(`TRÙM #${boss.level} HP: ${Math.ceil(hp)}`, x, y - 84);
-    }
-
-    function spawnTrackSegment(startY, level) {
-      const extraDiff = Math.max(0, bossDefeated - 2);
-      
-      for (let i = 0; i < 10; i++) {
-        const gy = startY - i * 75;
-        const leftVal = Math.max(1, 4 - Math.floor(extraDiff * 0.5));
-        const rightVal = Math.max(10, 50 - extraDiff * 6);
-
-        sideGates.push({ x: 42, y: gy, w: 58, h: 32, val: leftVal, isLeft: true, triggered: false });
-        sideGates.push({ x: SCREEN_WIDTH - 100, y: gy, w: 58, h: 32, val: rightVal, isLeft: false, triggered: false });
-      }
-
-      barricades.push({
-        x: SCREEN_WIDTH - 300,
-        y: startY - 420,
-        w: 190,
-        h: 44,
-        hp: 120 + level * 50 + extraDiff * 60
+    function triggerGateBuffEffect(x, y, val) {
+      shockwaves.push({
+        x: x,
+        y: y,
+        r: 10,
+        maxR: 95,
+        alpha: 1.0,
+        color: val >= 10 ? "#facc15" : "#38bdf8"
       });
 
-      const enemyRows = Math.min(28, 16 + level * 2 + extraDiff * 3);
-      for (let row = 0; row < enemyRows; row++) {
-        for (let col = 0; col < 8; col++) {
-          redEnemies.push({
-            x: SCREEN_WIDTH / 2 - 75 + col * 20 + (Math.random() * 8 - 4),
-            y: (startY - 460) - row * 18 + (Math.random() * 6 - 3),
-            alive: true
-          });
+      floatingTexts.push({
+        x: x,
+        y: y - 20,
+        text: `+${val} LÍNH!`,
+        alpha: 1.0,
+        color: val >= 10 ? "#facc15" : "#38bdf8",
+        scale: 1.4
+      });
+
+      for (let i = 0; i < 35; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 7 + 3;
+        particles.push({
+          x: x,
+          y: y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          radius: Math.random() * 4 + 2,
+          color: val >= 10 ? "#fde047" : "#67e8f9",
+          alpha: 1.0,
+          decay: Math.random() * 0.025 + 0.015
+        });
+      }
+    }
+
+    function draw3DSoldier(x, y, isBlue = true, scale = 1.0) {
+      ctx.save();
+      ctx.translate(x, y);
+
+      ctx.fillStyle = "rgba(5, 7, 12, 0.45)";
+      ctx.beginPath();
+      ctx.ellipse(0, 10 * scale, 9 * scale, 4.5 * scale, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      let armorGrad = ctx.createLinearGradient(-6 * scale, -10 * scale, 6 * scale, 8 * scale);
+      let helmetGrad = ctx.createLinearGradient(-5 * scale, -14 * scale, 5 * scale, -4 * scale);
+
+      if (isBlue) {
+        if (hasGoldenSkin) {
+          armorGrad.addColorStop(0, '#fef08a');
+          armorGrad.addColorStop(0.5, '#eab308');
+          armorGrad.addColorStop(1, '#854d0e');
+
+          helmetGrad.addColorStop(0, '#ffffff');
+          helmetGrad.addColorStop(0.4, '#facc15');
+          helmetGrad.addColorStop(1, '#a16207');
+        } else {
+          armorGrad.addColorStop(0, '#60a5fa');
+          armorGrad.addColorStop(0.5, '#2563eb');
+          armorGrad.addColorStop(1, '#1e3a8a');
+
+          helmetGrad.addColorStop(0, '#93c5fd');
+          helmetGrad.addColorStop(0.4, '#3b82f6');
+          helmetGrad.addColorStop(1, '#1d4ed8');
+        }
+      } else {
+        armorGrad.addColorStop(0, '#f87171');
+        armorGrad.addColorStop(0.5, '#dc2626');
+        armorGrad.addColorStop(1, '#7f1d1d');
+
+        helmetGrad.addColorStop(0, '#fca5a5');
+        helmetGrad.addColorStop(0.4, '#ef4444');
+        helmetGrad.addColorStop(1, '#991b1b');
+      }
+
+      ctx.fillStyle = armorGrad;
+      ctx.beginPath();
+      ctx.roundRect(-6 * scale, -2 * scale, 12 * scale, 11 * scale, 4 * scale);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255,255,255,0.3)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.fillStyle = "#fbcfe8";
+      ctx.beginPath();
+      ctx.arc(0, -5 * scale, 4.5 * scale, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = helmetGrad;
+      ctx.beginPath();
+      ctx.arc(0, -7 * scale, 5.5 * scale, 0, Math.PI, true);
+      ctx.fill();
+
+      ctx.fillStyle = isBlue ? "#38bdf8" : "#fbbf24";
+      ctx.fillRect(-3.5 * scale, -6.5 * scale, 7 * scale, 2.2 * scale);
+
+      ctx.fillStyle = "#1e293b";
+      ctx.fillRect(4 * scale, -1 * scale, 3.5 * scale, 8 * scale);
+      ctx.fillStyle = "#64748b";
+      ctx.fillRect(4.5 * scale, -4 * scale, 2.5 * scale, 4 * scale);
+
+      ctx.restore();
+    }
+
+    function drawGolemBoss3D(boss) {
+      const { x, y, hp, maxHp, flashTimer, bobbing, level } = boss;
+      const bY = y + Math.sin(bobbing) * 4;
+      const armSwing = Math.sin(bobbing * 1.5) * 6;
+
+      ctx.save();
+      ctx.translate(x, bY);
+
+      ctx.fillStyle = "rgba(0, 0, 0, 0.55)";
+      ctx.beginPath();
+      ctx.ellipse(0, 68, 75, 26, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      function drawRockBlock(rx, ry, rw, rh, rad = 8) {
+        const rockGrad = ctx.createLinearGradient(rx - rw/2, ry - rh/2, rx + rw/2, ry + rh/2);
+        rockGrad.addColorStop(0, '#a8a29e');
+        rockGrad.addColorStop(0.4, '#78716c');
+        rockGrad.addColorStop(1, '#44403c');
+        ctx.fillStyle = rockGrad;
+        ctx.beginPath();
+        ctx.roundRect(rx - rw/2, ry - rh/2, rw, rh, rad);
+        ctx.fill();
+        ctx.strokeStyle = '#292524';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(rx - rw/2 + rad, ry - rh/2 + 2);
+        ctx.lineTo(rx + rw/2 - rad, ry - rh/2 + 2);
+        ctx.stroke();
+      }
+
+      drawRockBlock(-32, 50, 24, 28, 6);
+      drawRockBlock(32, 50, 24, 28, 6);
+      drawRockBlock(-36, 64, 30, 16, 5);
+      drawRockBlock(36, 64, 30, 16, 5);
+
+      drawRockBlock(-54, -14, 28, 28, 10);
+      drawRockBlock(54, -14, 28, 28, 10);
+      
+      ctx.fillStyle = '#ff5722';
+      ctx.beginPath();
+      ctx.arc(-56, 8 + armSwing, 8, 0, Math.PI * 2);
+      ctx.arc(56, 8 - armSwing, 8, 0, Math.PI * 2);
+      ctx.fill();
+
+      drawRockBlock(-58, 25 + armSwing, 34, 46, 12);
+      drawRockBlock(58, 25 - armSwing, 34, 46, 12);
+
+      drawRockBlock(-64, 42 + armSwing, 12, 18, 4);
+      drawRockBlock(64, 42 - armSwing, 12, 18, 4);
+
+      drawRockBlock(0, 10, 76, 60, 18);
+
+      const glowCol = (flashTimer > 0) ? '#ffffff' : '#ff9800';
+      ctx.shadowColor = '#ff5722';
+      ctx.shadowBlur = 15;
+
+      ctx.strokeStyle = glowCol;
+      ctx.lineWidth = 4.5;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-24, -6);
+      ctx.lineTo(0, 8);
+      ctx.lineTo(24, -6);
+      ctx.moveTo(0, 8);
+      ctx.lineTo(0, 28);
+      ctx.moveTo(-16, 20);
+      ctx.lineTo(0, 16);
+      ctx.lineTo(16, 20);
+      ctx.stroke();
+
+      ctx.fillStyle = (flashTimer > 0) ? '#fff' : '#ffeb3b';
+      ctx.beginPath();
+      ctx.arc(0, 10, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      drawRockBlock(0, -32, 54, 46, 14);
+
+      const jawGrad = ctx.createLinearGradient(-22, -18, 22, -10);
+      jawGrad.addColorStop(0, '#57534e');
+      jawGrad.addColorStop(1, '#292524');
+      ctx.fillStyle = jawGrad;
+      ctx.beginPath();
+      ctx.roundRect(-22, -22, 44, 16, 6);
+      ctx.fill();
+      ctx.strokeStyle = '#1c1917';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.fillStyle = '#1c1917';
+      ctx.beginPath();
+      ctx.ellipse(-14, -36, 9, 8, 0, 0, Math.PI * 2);
+      ctx.ellipse(14, -36, 9, 8, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.shadowColor = '#ffeb3b';
+      ctx.shadowBlur = 10;
+      ctx.fillStyle = '#ff9800';
+      ctx.beginPath();
+      ctx.arc(-14, -36, 6, 0, Math.PI * 2);
+      ctx.arc(14, -36, 6, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#ffeb3b';
+      ctx.beginPath();
+      ctx.arc(-14, -36, 3.5, 0, Math.PI * 2);
+      ctx.arc(14, -36, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      const hpPct = Math.max(0, hp / maxHp);
+      ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
+      ctx.fillRect(-65, -74, 130, 14);
+      ctx.fillStyle = hpPct > 0.5 ? "#22c55e" : (hpPct > 0.25 ? "#eab308" : "#ef4444");
+      ctx.fillRect(-63, -72, 126 * hpPct, 10);
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(-65, -74, 130, 14);
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 11px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText(`GOLEM ĐÁ LAVA #${level} [${Math.ceil(hp)}/${maxHp}]`, 0, -82);
+
+      ctx.restore();
+    }
+
+    function drawMedievalCastleGate(x, y) {
+      ctx.save();
+      ctx.translate(x, y);
+
+      ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+      ctx.beginPath();
+      ctx.ellipse(0, 110, 240, 30, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      function drawStoneWallTexture(wx, wy, ww, wh) {
+        const stoneGrad = ctx.createLinearGradient(wx, wy, wx + ww, wy + wh);
+        stoneGrad.addColorStop(0, '#c7b299');
+        stoneGrad.addColorStop(0.3, '#a8947a');
+        stoneGrad.addColorStop(0.7, '#85735c');
+        stoneGrad.addColorStop(1, '#5c4d3c');
+        ctx.fillStyle = stoneGrad;
+        ctx.fillRect(wx, wy, ww, wh);
+        ctx.strokeStyle = "#382d22";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(wx, wy, ww, wh);
+
+        ctx.strokeStyle = "rgba(45, 35, 25, 0.4)";
+        ctx.lineWidth = 1.5;
+        for (let row = wy + 16; row < wy + wh; row += 16) {
+          ctx.beginPath();
+          ctx.moveTo(wx, row);
+          ctx.lineTo(wx + ww, row);
+          ctx.stroke();
         }
       }
 
-      const bossHp = 100 + level * 50 + extraDiff * 90;
-      bosses.push({
-        x: SCREEN_WIDTH / 2,
-        y: startY - 1100,
-        level: level,
-        hp: bossHp,
-        maxHp: bossHp,
-        shootTimer: 0,
-        moveDir: 1,
-        attackRate: Math.max(25, 75 - level * 4 - extraDiff * 6),
-        flashTimer: 0
-      });
+      drawStoneWallTexture(-120, -10, 240, 110);
+
+      ctx.fillStyle = "#120f0d";
+      ctx.beginPath();
+      ctx.arc(0, 30, 56, Math.PI, 0, false);
+      ctx.lineTo(56, 100);
+      ctx.lineTo(-56, 100);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.strokeStyle = "#d4be9b";
+      ctx.lineWidth = 10;
+      ctx.beginPath();
+      ctx.arc(0, 30, 60, Math.PI, 0, false);
+      ctx.stroke();
+      ctx.strokeStyle = "#382d22";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      for (let bx = -100; bx <= 70; bx += 38) {
+        drawStoneWallTexture(bx, -34, 26, 24);
+      }
+
+      function drawTower(tx) {
+        drawStoneWallTexture(tx - 48, -40, 96, 145);
+
+        const balconyGrad = ctx.createLinearGradient(tx - 58, -90, tx + 58, -40);
+        balconyGrad.addColorStop(0, '#dfceb8');
+        balconyGrad.addColorStop(1, '#705e4a');
+        ctx.fillStyle = balconyGrad;
+        ctx.beginPath();
+        ctx.moveTo(tx - 48, -40);
+        ctx.lineTo(tx - 60, -85);
+        ctx.lineTo(tx + 60, -85);
+        ctx.lineTo(tx + 48, -40);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = "#2e241b";
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+
+        ctx.strokeStyle = "#382d22";
+        ctx.lineWidth = 3;
+        for (let rx = tx - 44; rx <= tx + 44; rx += 14) {
+          ctx.beginPath();
+          ctx.moveTo(rx, -40);
+          ctx.lineTo(rx + (rx > tx ? 4 : -4), -85);
+          ctx.stroke();
+        }
+
+        for (let mx = tx - 56; mx <= tx + 34; mx += 26) {
+          drawStoneWallTexture(mx, -108, 20, 24);
+        }
+
+        ctx.fillStyle = "#120e0b";
+        ctx.beginPath();
+        ctx.arc(tx, -60, 11, Math.PI, 0);
+        ctx.lineTo(tx + 11, -44);
+        ctx.lineTo(tx - 11, -44);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = "#e5d5be";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = "#120e0b";
+        ctx.fillRect(tx - 7, 20, 14, 24);
+        ctx.strokeStyle = "#45382b";
+        ctx.strokeRect(tx - 7, 20, 14, 24);
+      }
+
+      drawTower(-160);
+      drawTower(160);
+
+      function drawIronGateDoor(gx, angle) {
+        ctx.save();
+        ctx.translate(gx, 50);
+        ctx.rotate(angle);
+
+        ctx.strokeStyle = "#4a3c31";
+        ctx.fillStyle = "#261e18";
+        ctx.lineWidth = 4;
+        
+        ctx.strokeRect(-3, -25, 42, 70);
+        ctx.beginPath();
+        ctx.moveTo(0, -25); ctx.lineTo(40, 45);
+        ctx.moveTo(40, -25); ctx.lineTo(0, 45);
+        ctx.stroke();
+
+        for (let sp = 2; sp <= 38; sp += 9) {
+          ctx.beginPath();
+          ctx.moveTo(sp, -25);
+          ctx.lineTo(sp, -36);
+          ctx.lineTo(sp + 3, -42);
+          ctx.lineTo(sp + 6, -36);
+          ctx.lineTo(sp + 6, -25);
+          ctx.fill();
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      drawIronGateDoor(-52, 0.45);
+      drawIronGateDoor(20, -0.45);
+
+      ctx.fillStyle = "#facc15";
+      ctx.font = "bold 13px serif";
+      ctx.textAlign = "center";
+      ctx.fillText("🏰 PHÁO ĐÀI CỔ TRUNG CỔ 🏰", 0, -50);
+
+      ctx.restore();
+    }
+
+    function spawnTrackSegment(startY, level) {
+      if (selectedGameMode === "RUNNER") {
+        const extraDiff = Math.max(0, bossDefeated - 2);
+        for (let i = 0; i < 9; i++) {
+          const gy = startY - i * 85;
+          const leftVal = Math.max(2, 5 - Math.floor(extraDiff * 0.5));
+          const rightVal = Math.max(10, 40 - extraDiff * 4);
+
+          sideGates.push({ x: 38, y: gy, w: 60, h: 36, val: leftVal, isLeft: true, triggered: false });
+          sideGates.push({ x: SCREEN_WIDTH - 98, y: gy, w: 60, h: 36, val: rightVal, isLeft: false, triggered: false });
+        }
+
+        barricades.push({
+          x: SCREEN_WIDTH - 300,
+          y: startY - 380,
+          w: 190,
+          h: 44,
+          hp: 100 + level * 40 + extraDiff * 50
+        });
+
+        const enemyRows = Math.min(20, 10 + level * 2 + extraDiff * 2);
+        for (let row = 0; row < enemyRows; row++) {
+          for (let col = 0; col < 8; col++) {
+            redEnemies.push({
+              x: SCREEN_WIDTH / 2 - 80 + col * 22 + (Math.random() * 6 - 3),
+              y: (startY - 430) - row * 20 + (Math.random() * 6 - 3),
+              alive: true
+            });
+          }
+        }
+
+        const bossHp = 130 + level * 70 + extraDiff * 90;
+        bosses.push({
+          x: SCREEN_WIDTH / 2,
+          y: startY - 1100,
+          level: level,
+          hp: bossHp,
+          maxHp: bossHp,
+          shootTimer: 0,
+          moveDir: 1,
+          attackRate: Math.max(30, 80 - level * 4 - extraDiff * 5),
+          flashTimer: 0,
+          bobbing: 0
+        });
+      }
     }
 
     function initGame() {
@@ -535,6 +849,7 @@
       bossDefeated = 0;
       currentBossLevel = 1;
       scrollSpeed = 1.8;
+      autoShootTimer = 0;
       bullets = [];
       bossBullets = [];
       sideGates = [];
@@ -542,66 +857,76 @@
       redEnemies = [];
       bosses = [];
       particles = [];
+      floatingTexts = [];
+      shockwaves = [];
       gameState = "PLAYING";
-      spawnTrackSegment(-100, 1);
+
+      if (selectedGameMode === "RUNNER") {
+        spawnTrackSegment(-100, 1);
+      }
     }
 
-    initGame();
+    function shootBullets() {
+      if (gameState !== "PLAYING" || mobCount <= 0) return;
+
+      let guns = Math.floor(Math.min(18, Math.max(2, mobCount / 4)));
+      if (hasPowerBuff) guns = Math.min(24, guns + 6);
+
+      for (let g = 0; g < guns; g++) {
+        const ox = (g - (guns - 1) / 2) * 8.5;
+        bullets.push({ 
+          x: playerX + ox, 
+          y: playerY - 20, 
+          speed: 18,
+          power: hasPowerBuff ? 3.5 : 1.8
+        });
+      }
+      playSound('shoot');
+    }
 
     let isDragging = false;
-    function handlePointer(clientX) {
-      if (gameState !== "PLAYING") return;
+    function updatePlayerPosition(clientX) {
       const rect = canvas.getBoundingClientRect();
       const scaleX = canvas.width / rect.width;
       playerX = (clientX - rect.left) * scaleX;
-      playerX = Math.max(60, Math.min(SCREEN_WIDTH - 60, playerX));
+      playerX = Math.max(65, Math.min(SCREEN_WIDTH - 65, playerX));
     }
 
     canvas.addEventListener("mousedown", (e) => {
-      if (gameState === "GAMEOVER") { initGame(); return; }
-      isDragging = true;
-      handlePointer(e.clientX);
+      if (gameState === "GAMEOVER") return;
+      if (gameState === "PLAYING") {
+        isDragging = true;
+        updatePlayerPosition(e.clientX);
+        if (selectedGameMode === "GATE_DEFENSE") shootBullets();
+      }
     });
-    window.addEventListener("mousemove", (e) => { if (isDragging) handlePointer(e.clientX); });
+    window.addEventListener("mousemove", (e) => {
+      if (isDragging && gameState === "PLAYING") updatePlayerPosition(e.clientX);
+    });
     window.addEventListener("mouseup", () => { isDragging = false; });
 
     canvas.addEventListener("touchstart", (e) => {
-      if (gameState === "GAMEOVER") { initGame(); return; }
-      isDragging = true;
-      handlePointer(e.touches[0].clientX);
+      if (gameState === "GAMEOVER") return;
+      if (gameState === "PLAYING") {
+        isDragging = true;
+        updatePlayerPosition(e.touches[0].clientX);
+        if (selectedGameMode === "GATE_DEFENSE") shootBullets();
+      }
     }, { passive: false });
     window.addEventListener("touchmove", (e) => {
-      if (isDragging && e.touches.length > 0) handlePointer(e.touches[0].clientX);
+      if (isDragging && gameState === "PLAYING" && e.touches.length > 0) {
+        updatePlayerPosition(e.touches[0].clientX);
+      }
     }, { passive: false });
     window.addEventListener("touchend", () => { isDragging = false; });
 
     function update() {
       if (gameState === "PLAYING") {
+        gameTick++;
         score++;
         if (score > highScore) {
           highScore = score;
-          localStorage.setItem("mobrun_highscore", highScore);
-        }
-
-        scrollSpeed = 1.8 + Math.min(2.0, bossDefeated * 0.25);
-
-        if (bosses.length === 0 || bosses[bosses.length - 1].y > -500) {
-          currentBossLevel++;
-          spawnTrackSegment(-300, currentBossLevel);
-        }
-
-        const shootInterval = hasPowerBuff ? 2 : 3;
-        shootCd++;
-        if (shootCd >= shootInterval) {
-          shootCd = 0;
-          let guns = Math.floor(Math.min(14, Math.max(2, mobCount / 5)));
-          if (hasPowerBuff) guns = Math.min(18, guns + 4);
-
-          for (let g = 0; g < guns; g++) {
-            const ox = (g - (guns - 1) / 2) * 8;
-            bullets.push({ x: playerX + ox, y: playerY - 25, speed: 17 });
-          }
-          playSound('shoot');
+          localStorage.setItem("mobrun_golem_highscore", highScore);
         }
 
         for (let i = particles.length - 1; i >= 0; i--) {
@@ -612,6 +937,90 @@
           if (p.alpha <= 0) particles.splice(i, 1);
         }
 
+        for (let i = shockwaves.length - 1; i >= 0; i--) {
+          const sw = shockwaves[i];
+          sw.r += 3.5;
+          sw.alpha -= 0.04;
+          if (sw.alpha <= 0) shockwaves.splice(i, 1);
+        }
+
+        for (let i = floatingTexts.length - 1; i >= 0; i--) {
+          const ft = floatingTexts[i];
+          ft.y -= 1.2;
+          ft.alpha -= 0.02;
+          if (ft.alpha <= 0) floatingTexts.splice(i, 1);
+        }
+
+        if (selectedGameMode === "RUNNER") {
+          scrollSpeed = 1.8 + Math.min(2.0, bossDefeated * 0.25);
+          
+          autoShootTimer++;
+          const shootInterval = hasPowerBuff ? 3 : 4;
+          if (autoShootTimer >= shootInterval) {
+            autoShootTimer = 0;
+            shootBullets();
+          }
+
+          if (bosses.length === 0 || bosses[bosses.length - 1].y > -450) {
+            currentBossLevel++;
+            spawnTrackSegment(-300, currentBossLevel);
+          }
+
+          for (let i = sideGates.length - 1; i >= 0; i--) {
+            const g = sideGates[i];
+            g.y += scrollSpeed;
+            if (!g.triggered && playerX >= g.x && playerX <= g.x + g.w && playerY >= g.y && playerY <= g.y + g.h) {
+              mobCount += g.val;
+              g.triggered = true;
+              triggerGateBuffEffect(g.x + g.w / 2, g.y, g.val);
+              playSound('gate');
+            }
+            if (g.y > SCREEN_HEIGHT + 50) sideGates.splice(i, 1);
+          }
+
+          for (let i = barricades.length - 1; i >= 0; i--) {
+            const bar = barricades[i];
+            bar.y += scrollSpeed;
+            if (bar.hp > 0 && playerX >= bar.x && playerX <= bar.x + bar.w && playerY >= bar.y && playerY <= bar.y + bar.h) {
+              const dmg = Math.min(bar.hp, mobCount);
+              mobCount = Math.max(0, mobCount - dmg);
+              bar.hp -= dmg;
+              playSound('hit');
+              if (bar.hp <= 0) createExplosion(bar.x + bar.w / 2, bar.y + bar.h / 2, "#94a3b8", 20);
+            }
+            if (bar.y > SCREEN_HEIGHT + 50) barricades.splice(i, 1);
+          }
+        }
+
+        if (selectedGameMode === "GATE_DEFENSE") {
+          if (gameTick % 42 === 0) {
+            redEnemies.push({
+              x: SCREEN_WIDTH / 2 + (Math.random() * 40 - 20),
+              y: 155,
+              vx: (Math.random() * 2.5 - 1.25),
+              vy: (Math.random() * 1.2 + 1.2),
+              alive: true
+            });
+          }
+
+          if (bosses.length === 0 && gameTick % 250 === 0) {
+            currentBossLevel++;
+            const bossHp = 150 + currentBossLevel * 80;
+            bosses.push({
+              x: SCREEN_WIDTH / 2,
+              y: 155,
+              level: currentBossLevel,
+              hp: bossHp,
+              maxHp: bossHp,
+              shootTimer: 0,
+              moveDir: 1,
+              attackRate: Math.max(35, 75 - currentBossLevel * 3),
+              flashTimer: 0,
+              bobbing: 0
+            });
+          }
+        }
+
         for (let i = bullets.length - 1; i >= 0; i--) {
           const b = bullets[i];
           b.y -= b.speed;
@@ -620,9 +1029,9 @@
           let hit = false;
           for (let bar of barricades) {
             if (bar.hp > 0 && b.x >= bar.x && b.x <= bar.x + bar.w && b.y >= bar.y && b.y <= bar.y + bar.h) {
-              bar.hp -= (hasPowerBuff ? 3.0 : 1.5);
+              bar.hp -= b.power;
               playSound('hit');
-              if (bar.hp <= 0) createExplosion(bar.x + bar.w / 2, bar.y + bar.h / 2, "#8c8e94", 20);
+              if (bar.hp <= 0) createExplosion(bar.x + bar.w / 2, bar.y + bar.h / 2, "#94a3b8", 20);
               hit = true;
               break;
             }
@@ -630,10 +1039,16 @@
           if (hit) { bullets.splice(i, 1); continue; }
 
           for (let e of redEnemies) {
-            if (e.alive && Math.hypot(e.x - b.x, e.y - b.y) < 14) {
+            if (e.alive && Math.hypot(e.x - b.x, e.y - b.y) < 18) {
               e.alive = false;
-              createExplosion(e.x, e.y, "#b71c1c", 8);
+              createExplosion(e.x, e.y, "#ef4444", 8);
               playSound('hit');
+
+              if (selectedGameMode === "GATE_DEFENSE") {
+                mobCount += 1;
+                triggerGateBuffEffect(e.x, e.y, 1);
+              }
+
               hit = true;
               break;
             }
@@ -642,15 +1057,23 @@
 
           for (let j = bosses.length - 1; j >= 0; j--) {
             const boss = bosses[j];
-            if (Math.hypot(boss.x - b.x, boss.y - b.y) < 50) {
-              boss.hp -= (hasPowerBuff ? 6.5 : 3.5);
+            if (Math.hypot(boss.x - b.x, boss.y - b.y) < 60) {
+              boss.hp -= b.power * 2;
+              if (selectedGameMode === "GATE_DEFENSE") boss.y -= 4;
               playSound('hit');
               
               if (boss.hp <= 0) {
-                createExplosion(boss.x, boss.y, "#ff3232", 45);
-                createExplosion(boss.x, boss.y - 30, "#ffe650", 30);
+                createExplosion(boss.x, boss.y, "#78716c", 50);
+                createExplosion(boss.x, boss.y - 20, "#ff5722", 40);
                 playSound('explosion');
                 bosses.splice(j, 1);
+
+                // CỘNG CỐ ĐỊNH 15 LÍNH KHI DIỆT BOSS Ở CHẾ ĐỘ 2
+                const bossBonus = (selectedGameMode === "GATE_DEFENSE") ? 15 : 10;
+
+                mobCount += bossBonus;
+                triggerGateBuffEffect(boss.x, boss.y, bossBonus);
+
                 bossDefeated++;
               }
               hit = true;
@@ -660,12 +1083,18 @@
           if (hit) { bullets.splice(i, 1); continue; }
         }
 
-        // Cập nhật Boss Lớn
         for (let i = bosses.length - 1; i >= 0; i--) {
           const boss = bosses[i];
-          boss.y += scrollSpeed;
-          boss.x += boss.moveDir * (1.0 + Math.min(1.5, bossDefeated * 0.15));
-          if (boss.x < 150 || boss.x > SCREEN_WIDTH - 150) boss.moveDir *= -1;
+          boss.bobbing += 0.07;
+          
+          if (selectedGameMode === "RUNNER") {
+            boss.y += scrollSpeed;
+          } else {
+            boss.y += 0.55 + Math.min(0.8, bossDefeated * 0.1);
+          }
+
+          boss.x += boss.moveDir * (1.3 + Math.min(1.7, bossDefeated * 0.15));
+          if (boss.x < 120 || boss.x > SCREEN_WIDTH - 120) boss.moveDir *= -1;
 
           if (boss.flashTimer > 0) boss.flashTimer--;
 
@@ -673,47 +1102,52 @@
             boss.shootTimer++;
             if (boss.shootTimer >= boss.attackRate) {
               boss.shootTimer = 0;
-              boss.flashTimer = 6;
-              const angle = Math.atan2(playerY - (boss.y + 35), playerX - (boss.x + 18));
+              boss.flashTimer = 8;
+              const angle = Math.atan2(playerY - boss.y, playerX - boss.x);
               bossBullets.push({
-                x: boss.x + 18,
-                y: boss.y + 35,
-                vx: Math.cos(angle) * (4.5 + Math.min(2.5, bossDefeated * 0.2)),
-                vy: Math.sin(angle) * (4.5 + Math.min(2.5, bossDefeated * 0.2))
+                x: boss.x - 20, y: boss.y + 40,
+                vx: Math.cos(angle - 0.12) * 4.2, vy: Math.sin(angle - 0.12) * 4.2
+              });
+              bossBullets.push({
+                x: boss.x + 20, y: boss.y + 40,
+                vx: Math.cos(angle + 0.12) * 4.2, vy: Math.sin(angle + 0.12) * 4.2
               });
             }
           }
 
-          if (Math.hypot(playerX - boss.x, playerY - boss.y) < 70) {
-            boss.hp -= 10;
+          if (Math.hypot(playerX - boss.x, playerY - boss.y) < 75) {
+            boss.hp -= 12;
             mobCount = Math.max(0, mobCount - 3);
             if (boss.hp <= 0) {
-              createExplosion(boss.x, boss.y, "#ff3232", 45);
+              createExplosion(boss.x, boss.y, "#ff5722", 50);
               playSound('explosion');
               bosses.splice(i, 1);
+
+              const bossBonus = (selectedGameMode === "GATE_DEFENSE") ? 15 : 10;
+              mobCount += bossBonus;
+              triggerGateBuffEffect(boss.x, boss.y, bossBonus);
+
               bossDefeated++;
               continue;
             }
           }
 
-          // BOSS LỚN RƠI KHỎI MÀN HÌNH -> TRỪ 10 MÁU
           if (boss.y > SCREEN_HEIGHT + 100) {
             mobCount = Math.max(0, mobCount - 10);
-            createExplosion(playerX, playerY, "#ef4444", 25);
+            createExplosion(playerX, playerY, "#ff5722", 25);
             playSound('hit');
             bosses.splice(i, 1);
           }
         }
 
-        // Cập nhật đạn của Boss
         for (let i = bossBullets.length - 1; i >= 0; i--) {
           const bb = bossBullets[i];
           bb.x += bb.vx;
           bb.y += bb.vy;
 
-          if (Math.hypot(playerX - bb.x, playerY - bb.y) < 30) {
-            mobCount = Math.max(0, mobCount - 3);
-            createExplosion(bb.x, bb.y, "#ff5014", 12);
+          if (Math.hypot(playerX - bb.x, playerY - bb.y) < 32) {
+            mobCount = Math.max(0, mobCount - 2);
+            createExplosion(bb.x, bb.y, "#ff5722", 14);
             playSound('hit');
             bossBullets.splice(i, 1);
             continue;
@@ -723,49 +1157,27 @@
           }
         }
 
-        // Cổng cấp số
-        for (let i = sideGates.length - 1; i >= 0; i--) {
-          const g = sideGates[i];
-          g.y += scrollSpeed;
-          if (!g.triggered && playerX >= g.x && playerX <= g.x + g.w && playerY >= g.y && playerY <= g.y + g.h) {
-            mobCount += g.val;
-            g.triggered = true;
-            playSound('gate');
-          }
-          if (g.y > SCREEN_HEIGHT + 50) sideGates.splice(i, 1);
-        }
-
-        // Rào chắn
-        for (let i = barricades.length - 1; i >= 0; i--) {
-          const bar = barricades[i];
-          bar.y += scrollSpeed;
-          if (bar.hp > 0 && playerX >= bar.x && playerX <= bar.x + bar.w && playerY >= bar.y && playerY <= bar.y + bar.h) {
-            const dmg = Math.min(bar.hp, mobCount);
-            mobCount = Math.max(0, mobCount - dmg);
-            bar.hp -= dmg;
-            playSound('hit');
-            if (bar.hp <= 0) createExplosion(bar.x + bar.w / 2, bar.y + bar.h / 2, "#8c8e94", 20);
-          }
-          if (bar.y > SCREEN_HEIGHT + 50) barricades.splice(i, 1);
-        }
-
-        // Cập nhật Boss Nhỏ (Lính đỏ)
         for (let i = redEnemies.length - 1; i >= 0; i--) {
           const e = redEnemies[i];
-          e.y += scrollSpeed;
+          if (selectedGameMode === "RUNNER") {
+            e.y += scrollSpeed;
+          } else {
+            e.x += e.vx;
+            e.y += e.vy;
+            if (e.x < 60 || e.x > SCREEN_WIDTH - 60) e.vx *= -1;
+          }
 
           if (e.alive && Math.hypot(playerX - e.x, playerY - e.y) < 25) {
             e.alive = false;
             mobCount = Math.max(0, mobCount - 1);
-            createExplosion(e.x, e.y, "#b71c1c", 8);
+            createExplosion(e.x, e.y, "#ef4444", 8);
             playSound('hit');
           }
 
-          // BOSS NHỎ RƠI KHỎI MÀN HÌNH KHI CHƯA BỊ DIỆT -> TRỪ 1 MÁU
           if (e.y > SCREEN_HEIGHT + 30) {
             if (e.alive) {
               mobCount = Math.max(0, mobCount - 1);
-              createExplosion(playerX, playerY, "#ff3232", 6);
+              createExplosion(playerX, playerY, "#ef4444", 6);
               playSound('hit');
             }
             redEnemies.splice(i, 1);
@@ -783,45 +1195,111 @@
     function draw() {
       ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-      ctx.fillStyle = "#a8abb2";
-      ctx.fillRect(35, 0, SCREEN_WIDTH - 70, SCREEN_HEIGHT);
-      ctx.strokeStyle = "#64748b";
-      ctx.lineWidth = 4;
-      ctx.strokeRect(35, 0, SCREEN_WIDTH - 70, SCREEN_HEIGHT);
+      if (selectedGameMode === "GATE_DEFENSE") {
+        const defenseBg = ctx.createRadialGradient(SCREEN_WIDTH/2, 200, 50, SCREEN_WIDTH/2, 400, 500);
+        defenseBg.addColorStop(0, '#2d241e');
+        defenseBg.addColorStop(0.5, '#171310');
+        defenseBg.addColorStop(1, '#080605');
+        ctx.fillStyle = defenseBg;
+        ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-      for (let g of sideGates) {
-        ctx.fillStyle = g.isLeft ? "#0284c7" : "#eab308";
-        ctx.fillRect(g.x, g.y, g.w, g.h);
-        ctx.strokeStyle = "#ffffff";
+        drawMedievalCastleGate(SCREEN_WIDTH / 2, 130);
+      } else {
+        const roadGrad = ctx.createLinearGradient(0, 0, 0, SCREEN_HEIGHT);
+        roadGrad.addColorStop(0, '#1e293b');
+        roadGrad.addColorStop(1, '#0f172a');
+        ctx.fillStyle = roadGrad;
+        ctx.fillRect(30, 0, SCREEN_WIDTH - 60, SCREEN_HEIGHT);
+        ctx.strokeStyle = "#334155";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(30, 0, SCREEN_WIDTH - 60, SCREEN_HEIGHT);
+
+        ctx.strokeStyle = "rgba(148, 163, 184, 0.25)";
         ctx.lineWidth = 2;
-        ctx.strokeRect(g.x, g.y, g.w, g.h);
-        ctx.fillStyle = g.isLeft ? "#ffffff" : "#1e1e1e";
-        ctx.font = "bold 16px Arial";
-        ctx.textAlign = "center";
-        ctx.fillText(`+${g.val}`, g.x + g.w / 2, g.y + 22);
-      }
+        ctx.setLineDash([20, 20]);
+        ctx.lineDashOffset = -gameTick * scrollSpeed;
+        ctx.beginPath();
+        ctx.moveTo(SCREEN_WIDTH / 2, 0);
+        ctx.lineTo(SCREEN_WIDTH / 2, SCREEN_HEIGHT);
+        ctx.stroke();
+        ctx.setLineDash([]);
 
-      for (let bar of barricades) {
-        if (bar.hp > 0) {
-          ctx.fillStyle = "#475569";
-          ctx.fillRect(bar.x, bar.y, bar.w, bar.h);
-          ctx.fillStyle = "#ffffff";
-          ctx.font = "bold 20px Arial";
+        for (let g of sideGates) {
+          ctx.fillStyle = g.isLeft ? "rgba(2, 132, 199, 0.85)" : "rgba(234, 179, 8, 0.85)";
+          ctx.beginPath();
+          ctx.roundRect(g.x, g.y, g.w, g.h, 8);
+          ctx.fill();
+          ctx.strokeStyle = "#ffffff";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          ctx.fillStyle = g.isLeft ? "#ffffff" : "#0f172a";
+          ctx.font = "bold 16px Arial";
           ctx.textAlign = "center";
-          ctx.fillText(`${Math.ceil(bar.hp)}`, bar.x + bar.w / 2, bar.y + 28);
+          ctx.fillText(`+${g.val}`, g.x + g.w / 2, g.y + 24);
+        }
+
+        for (let bar of barricades) {
+          if (bar.hp > 0) {
+            ctx.fillStyle = "#334155";
+            ctx.beginPath();
+            ctx.roundRect(bar.x, bar.y, bar.w, bar.h, 6);
+            ctx.fill();
+            ctx.strokeStyle = "#64748b";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.fillStyle = "#f8fafc";
+            ctx.font = "bold 18px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(`🛡 ${Math.ceil(bar.hp)}`, bar.x + bar.w / 2, bar.y + 28);
+          }
         }
       }
 
+      for (let sw of shockwaves) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, sw.alpha);
+        ctx.strokeStyle = sw.color;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(sw.x, sw.y, sw.r, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
       for (let e of redEnemies) {
-        if (e.alive && e.y > -20 && e.y < SCREEN_HEIGHT + 20) {
-          drawSoldier(e.x, e.y, false, 0.9);
+        if (e.alive && e.y > 0 && e.y < SCREEN_HEIGHT + 20) {
+          draw3DSoldier(e.x, e.y, false, 0.95);
         }
       }
 
       for (let boss of bosses) {
-        if (boss.y > -120 && boss.y < SCREEN_HEIGHT + 100) {
-          drawBoss3D(boss);
+        if (boss.y > -140 && boss.y < SCREEN_HEIGHT + 100) {
+          drawGolemBoss3D(boss);
         }
+      }
+
+      for (let b of bullets) {
+        ctx.fillStyle = hasPowerBuff ? "#f43f5e" : "#38bdf8";
+        ctx.beginPath();
+        ctx.ellipse(b.x, b.y, hasPowerBuff ? 4.5 : 3.5, 9, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      for (let bb of bossBullets) {
+        ctx.fillStyle = "#ff5722";
+        ctx.beginPath();
+        ctx.arc(bb.x, bb.y, 7, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#ffeb3b";
+        ctx.beginPath();
+        ctx.arc(bb.x, bb.y, 3.5, 0, Math.PI * 2);
+        ctx.fill();
       }
 
       for (let p of particles) {
@@ -834,40 +1312,48 @@
         ctx.restore();
       }
 
-      for (let b of bullets) {
-        ctx.strokeStyle = hasPowerBuff ? "#f43f5e" : "#fde047";
-        ctx.lineWidth = hasPowerBuff ? 4 : 3;
-        ctx.beginPath();
-        ctx.moveTo(b.x, b.y);
-        ctx.lineTo(b.x, b.y - 12);
-        ctx.stroke();
-      }
-
-      for (let bb of bossBullets) {
-        ctx.fillStyle = "#ea580c";
-        ctx.beginPath();
-        ctx.arc(bb.x, bb.y, 6, 0, Math.PI * 2);
-        ctx.fill();
+      for (let ft of floatingTexts) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, ft.alpha);
+        ctx.fillStyle = ft.color;
+        ctx.font = `bold 22px Arial`;
+        ctx.textAlign = "center";
+        ctx.shadowColor = "#000";
+        ctx.shadowBlur = 8;
+        ctx.fillText(ft.text, ft.x, ft.y);
+        ctx.restore();
       }
 
       if (mobCount > 0) {
-        const clusterR = Math.min(18 + Math.sqrt(mobCount) * 3.5, 65);
+        const clusterR = Math.min(20 + Math.sqrt(mobCount) * 3.8, 70);
         const visCount = Math.min(mobCount, 55);
         for (let i = 0; i < visCount; i++) {
           const ang = (i * 2.39996);
           const d = (Math.sqrt(i) / Math.sqrt(visCount)) * clusterR;
-          drawSoldier(playerX + d * Math.cos(ang), playerY + d * Math.sin(ang) * 0.7, true, 1.0);
+          draw3DSoldier(playerX + d * Math.cos(ang), playerY + d * Math.sin(ang) * 0.7, true, 1.05);
         }
 
-        ctx.fillStyle = "#0f172a";
-        ctx.fillRect(playerX - 25, playerY - clusterR - 28, 50, 22);
-        ctx.strokeStyle = hasGoldenSkin ? "#ffd700" : "#ffffff";
+        ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
+        ctx.beginPath();
+        ctx.roundRect(playerX - 30, playerY - clusterR - 30, 60, 22, 6);
+        ctx.fill();
+        ctx.strokeStyle = hasGoldenSkin ? "#facc15" : "#38bdf8";
         ctx.lineWidth = 1.5;
-        ctx.strokeRect(playerX - 25, playerY - clusterR - 28, 50, 22);
-        ctx.fillStyle = hasGoldenSkin ? "#ffd700" : "#ffffff";
-        ctx.font = "bold 14px Arial";
+        ctx.stroke();
+
+        ctx.fillStyle = hasGoldenSkin ? "#facc15" : "#38bdf8";
+        ctx.font = "bold 13px Arial";
         ctx.textAlign = "center";
-        ctx.fillText(`${mobCount}`, playerX, playerY - clusterR - 12);
+        ctx.fillText(`⚔ ${mobCount}`, playerX, playerY - clusterR - 14);
+      }
+
+      ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+      ctx.font = "12px Arial";
+      ctx.textAlign = "center";
+      if (selectedGameMode === "RUNNER") {
+        ctx.fillText("⚡ CHẾ ĐỘ 1: BẮN TỰ ĐỘNG (KÉO RÊ ĐỂ DI CHUYỂN) ⚡", SCREEN_WIDTH / 2, SCREEN_HEIGHT - 20);
+      } else {
+        ctx.fillText("⚡ CHẾ ĐỘ 2: NHẤP ĐỂ BẮN (DIỆT LÍNH +1, DIỆT TRÙM +15 LÍNH) ⚡", SCREEN_WIDTH / 2, SCREEN_HEIGHT - 20);
       }
 
       ctx.fillStyle = "rgba(15, 23, 42, 0.95)";
@@ -887,7 +1373,7 @@
       ctx.fillText(`KỶ LỤC: ${highScore}`, SCREEN_WIDTH - 15, 30);
 
       if (gameState === "PAUSED") {
-        ctx.fillStyle = "rgba(0, 0, 0, 0.65)";
+        ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
         ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         ctx.fillStyle = "#ffffff";
         ctx.font = "bold 30px Arial";
@@ -896,7 +1382,7 @@
       }
 
       if (gameState === "GAMEOVER") {
-        ctx.fillStyle = "rgba(10, 10, 15, 0.88)";
+        ctx.fillStyle = "rgba(10, 14, 23, 0.92)";
         ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
         ctx.fillStyle = "#ef4444";
@@ -913,15 +1399,17 @@
         ctx.fillText(`Điểm trận này: ${score}`, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 5);
         ctx.fillText(`Điểm kỷ lục: ${highScore}`, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 30);
 
-        ctx.fillStyle = "#ffb703";
-        ctx.fillRect(SCREEN_WIDTH / 2 - 110, SCREEN_HEIGHT / 2 + 65, 220, 42);
-        ctx.fillStyle = "#000000";
+        ctx.fillStyle = "#facc15";
+        ctx.beginPath();
+        ctx.roundRect(SCREEN_WIDTH / 2 - 110, SCREEN_HEIGHT / 2 + 65, 220, 42, 10);
+        ctx.fill();
+        ctx.fillStyle = "#0f172a";
         ctx.font = "bold 15px Arial";
         ctx.fillText("HỒI SINH (0.1 Pi)", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 91);
 
         ctx.fillStyle = "#94a3b8";
         ctx.font = "14px Arial";
-        ctx.fillText("Chạm bất kỳ đâu bên ngoài để chơi lại từ đầu", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 135);
+        ctx.fillText("Chạm bất kỳ đâu bên ngoài để đổi chế độ chơi", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 135);
       }
     }
 
@@ -935,7 +1423,10 @@
 
         if (cx >= SCREEN_WIDTH / 2 - 110 && cx <= SCREEN_WIDTH / 2 + 110 &&
             cy >= SCREEN_HEIGHT / 2 + 65 && cy <= SCREEN_HEIGHT / 2 + 107) {
-          buyRevive();
+          buyItem('revive', 0.1, 'Hồi Sinh Nhân Vật (Mob Run)');
+        } else {
+          document.getElementById("mode-modal").style.display = "flex";
+          gameState = "MENU";
         }
       }
     });
