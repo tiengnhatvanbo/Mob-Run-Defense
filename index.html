@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Mob Run & Medieval Castle Gate Defense 3D</title>
-  <!-- Pi Network SDK & Pi Ads SDK -->
+  <title>Mob Run & Medieval Castle Gate Defense 3D - Pi Ecosystem</title>
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
   <style>
     * {
@@ -37,9 +36,9 @@
 
     #top-nav {
       position: absolute;
-      top: 12px;
-      left: 15px;
-      right: 15px;
+      top: 10px;
+      left: 10px;
+      right: 10px;
       z-index: 100;
       display: flex;
       justify-content: space-between;
@@ -52,8 +51,8 @@
       border: none;
       outline: none;
       font-weight: bold;
-      border-radius: 18px;
-      padding: 7px 15px;
+      border-radius: 16px;
+      padding: 7px 14px;
       font-size: 13px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.5);
       transition: transform 0.1s;
@@ -61,171 +60,263 @@
     .interactive-btn:active {
       transform: scale(0.92);
     }
-    #pause-btn {
+    #hamburger-btn {
       background: #1e293b;
-      color: #f8fafc;
-      border: 1px solid #475569;
+      color: #38bdf8;
+      border: 1.5px solid #38bdf8;
+      font-size: 16px;
+      padding: 6px 12px;
     }
-    #shop-btn {
-      background: linear-gradient(135deg, #f59e0b, #b45309);
-      color: #fff;
-      border: 1px solid #fde047;
-    }
-    #sign-in-button {
-      background: #eab308;
-      color: #0f172a;
-      border: 2px solid #ffffff;
-    }
+    #pause-btn { background: #334155; color: #f8fafc; border: 1px solid #64748b; }
+    #sign-in-button { background: #eab308; color: #0f172a; border: 2px solid #ffffff; }
+    
     #user-profile {
       display: none;
       background: rgba(15, 23, 42, 0.9);
       color: #facc15;
       border: 1px solid #facc15;
-      padding: 6px 14px;
-      border-radius: 15px;
-      font-size: 13px;
+      padding: 5px 10px;
+      border-radius: 14px;
+      font-size: 11px;
       font-weight: bold;
       pointer-events: auto;
     }
 
-    #mode-modal {
-      display: flex;
-      flex-direction: column;
+    /* Side Drawer Menu 3 Gạch */
+    #drawer-menu {
+      display: none;
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 90%;
-      max-width: 410px;
+      top: 0;
+      left: 0;
+      width: 250px;
+      height: 100vh;
       background: rgba(15, 23, 42, 0.98);
-      border: 2px solid #38bdf8;
-      border-radius: 20px;
-      padding: 24px;
-      color: #fff;
-      z-index: 300;
-      box-shadow: 0 0 50px rgba(56, 189, 248, 0.3);
-      text-align: center;
+      border-right: 2px solid #38bdf8;
+      z-index: 400;
+      padding: 20px 14px;
+      box-shadow: 10px 0 30px rgba(0,0,0,0.8);
+      flex-direction: column;
+      gap: 10px;
     }
-    .mode-btn {
-      background: linear-gradient(135deg, #1e293b, #334155);
-      border: 1.5px solid #64748b;
-      border-radius: 14px;
-      padding: 14px;
-      margin: 10px 0;
+    .drawer-item-btn {
+      background: #1e293b;
       color: #fff;
-      cursor: pointer;
+      border: 1px solid #334155;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: bold;
       text-align: left;
-      transition: all 0.2s;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .mode-btn:hover {
+    .drawer-item-btn:hover {
       border-color: #38bdf8;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
-    }
-    .mode-btn strong {
-      display: block;
-      font-size: 16px;
-      margin-bottom: 4px;
-      color: #facc15;
-    }
-    .mode-btn span {
-      font-size: 12px;
-      color: #94a3b8;
+      background: #334155;
     }
 
-    #shop-modal {
+    /* Modal Hộp Thoại Duy Nhất */
+    .modal-box {
       display: none;
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 90%;
-      max-width: 380px;
+      width: 92%;
+      max-width: 440px;
       background: rgba(15, 23, 42, 0.98);
-      border: 2px solid #facc15;
       border-radius: 18px;
-      padding: 22px;
+      padding: 18px;
       color: #fff;
-      z-index: 200;
-      box-shadow: 0 0 40px rgba(0,0,0,0.9);
+      z-index: 300;
+      box-shadow: 0 0 50px rgba(0,0,0,0.95);
       text-align: center;
+      max-height: 85vh;
+      overflow-y: auto;
     }
-    .shop-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #1e293b;
-      padding: 12px 14px;
-      margin: 12px 0;
+
+    #mode-modal {
+      border: 2px solid #38bdf8;
+    }
+    .mode-btn {
+      background: linear-gradient(135deg, #1e293b, #334155);
+      border: 1.5px solid #64748b;
       border-radius: 12px;
-      border: 1px solid #334155;
-    }
-    .shop-btn-buy {
-      background: #facc15;
-      color: #0f172a;
-      border: none;
-      padding: 8px 14px;
-      font-weight: bold;
-      border-radius: 8px;
+      padding: 12px;
+      margin: 8px 0;
+      color: #fff;
       cursor: pointer;
+      text-align: left;
     }
-    .close-shop-btn {
-      margin-top: 12px;
+    .mode-btn strong { display: block; font-size: 14px; margin-bottom: 3px; color: #facc15; }
+    .mode-btn span { font-size: 11px; color: #94a3b8; }
+
+    .modal-btn-close {
+      margin-top: 14px;
       background: #475569;
       color: #fff;
       border: none;
-      padding: 9px 24px;
-      border-radius: 20px;
+      padding: 8px 20px;
+      border-radius: 16px;
       cursor: pointer;
       font-weight: bold;
+      font-size: 12px;
     }
+    
+    .panel-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 10px;
+      margin: 8px 0;
+      text-align: left;
+      font-size: 12px;
+    }
+
+    .log-container {
+      max-height: 150px;
+      overflow-y: auto;
+      background: #090d16;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 8px;
+      font-family: monospace;
+      font-size: 11px;
+      text-align: left;
+    }
+    .log-item { margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid #1e293b; line-height: 1.4; }
   </style>
 </head>
 <body>
 
+  <!-- Top Navigation -->
   <div id="top-nav">
-    <div style="display: flex; gap: 8px;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <button id="hamburger-btn" class="interactive-btn" onclick="toggleDrawer()">☰ Menu</button>
       <button id="pause-btn" class="interactive-btn" onclick="togglePause()">⏸ Tạm Dừng</button>
-      <button id="shop-btn" class="interactive-btn" onclick="toggleShop(true)">🛒 Shop Pi</button>
     </div>
-    <div style="display: flex; gap: 8px; align-items: center;">
+    <div style="display: flex; gap: 6px; align-items: center;">
       <button id="sign-in-button" class="interactive-btn" onclick="signIn()">Đăng nhập Pi</button>
       <div id="user-profile"></div>
     </div>
   </div>
 
-  <div id="mode-modal">
-    <h2 style="color: #38bdf8; margin-bottom: 6px;">CHỌN CHẾ ĐỘ CHIẾN ĐẤU</h2>
-    <p style="font-size: 12px; color: #94a3b8; margin-bottom: 14px;">Chọn phong cách đồ hoạ và cơ chế bắn</p>
+  <!-- Menu 3 Gạch -->
+  <div id="drawer-menu">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <h3 style="color:#38bdf8; font-size:16px;">DANH MỤC GAME</h3>
+      <button onclick="closeAllPanels()" style="background:none; border:none; color:#94a3b8; font-size:20px; cursor:pointer;">✕</button>
+    </div>
+    <button class="drawer-item-btn" onclick="openSingleModal('mode-modal')">🎮 Chọn Chế Độ Chơi</button>
+    <button class="drawer-item-btn" onclick="openSingleModal('reward-modal')">🎁 Phần Thưởng Pi (Kỷ Lục)</button>
+    <button class="drawer-item-btn" onclick="openSingleModal('invest-modal')">🏦 Quỹ Đầu Tư (Pool 1000)</button>
+    <button class="drawer-item-btn" onclick="openSingleModal('history-modal')">📜 Lịch Sử Hoạt Động</button>
+    <button class="drawer-item-btn" onclick="openSingleModal('shop-modal')">🛒 Cửa Hàng Vật Phẩm</button>
+  </div>
+
+  <!-- Modal Chế Độ Chơi -->
+  <div id="mode-modal" class="modal-box">
+    <h2 style="color: #38bdf8; margin-bottom: 6px; font-size: 18px;">CHỌN CHẾ ĐỘ CHIẾN ĐẤU</h2>
+    <p style="font-size: 11px; color: #94a3b8; margin-bottom: 10px;">Bắn hạ nhiều Boss nhất trong 1 trận để nhận thưởng Pi</p>
     
     <div class="mode-btn" onclick="startSelectedMode('RUNNER')">
       <strong>🏃 Chế Độ 1: Chạy Vượt Ải (BẮN TỰ ĐỘNG)</strong>
-      <span>Tự động xả đạn liên hồi, nhặt cổng nhân quân số, vượt ải và săn Golem.</span>
+      <span>Tự xả đạn liên tục, ăn cổng cộng quân, bắn trùm theo từng chặng.</span>
     </div>
 
     <div class="mode-btn" onclick="startSelectedMode('GATE_DEFENSE')">
-      <strong>🏰 Chế Độ 2: Thủ Thành Cổng Cổ 3D</strong>
-      <span>Đứng trước cổng thành cổ 3D mở hé, nhấp bắn đẩy lùi. Diệt lính +1, diệt Boss +15 lính!</span>
+      <strong>🏰 Chế Độ 2: Thủ Thành Cổng Cổ (ĐỘ KHÓ CAO)</strong>
+      <span>Nhấp bắn đẩy lùi. Diệt lính +1, diệt Boss +15. <b style="color:#ef4444">Trúng đạn Boss mất 2 lính!</b></span>
     </div>
+    <button class="modal-btn-close" onclick="closeAllPanels()">Đóng</button>
   </div>
 
-  <div id="shop-modal">
-    <h2 style="color: #facc15; margin-bottom: 12px;">CỬA HÀNG VẬT PHẨM PI</h2>
-    <div class="shop-item">
-      <div style="text-align: left;">
+  <!-- Modal Thưởng Boss Kỷ Lục -->
+  <div id="reward-modal" class="modal-box" style="border: 2px solid #10b981;">
+    <h2 style="color: #34d399; margin-bottom: 6px; font-size: 18px;">🎁 THƯỞNG PI THEO KỶ LỤC TRẬN</h2>
+    <p style="font-size: 11px; color: #94a3b8;">Tính số Boss hạ gục cao nhất trong 1 trận (Không cộng dồn)</p>
+    
+    <div class="panel-card">
+      <div style="display:flex; justify-content:space-between; margin-bottom: 4px;">
+        <span>Kỷ lục trận cao nhất: <b id="ui-max-match-boss" style="color:#facc15">0 Boss</b></span>
+        <span>Pi chờ rút: <b id="ui-pending-pi" style="color:#38bdf8">0.00 Pi</b></span>
+      </div>
+      <div>Trạng thái: <b id="ui-kyc-status" style="color:#ef4444">Chưa liên kết / Chưa KYC</b></div>
+    </div>
+
+    <div class="panel-card" style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <strong>Kỷ lục 1 trận ≥ 50 Boss</strong>
+        <div style="font-size: 11px; color: #94a3b8;">Tặng thưởng: <b style="color:#facc15">2.5 Pi</b></div>
+      </div>
+      <button id="btn-claim-50" class="interactive-btn" style="background:#10b981; color:#fff;" onclick="claimBossReward(50, 2.5)">Nhận Thưởng</button>
+    </div>
+
+    <div class="panel-card" style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <strong>Kỷ lục 1 trận ≥ 100 Boss</strong>
+        <div style="font-size: 11px; color: #94a3b8;">Tặng thưởng: <b style="color:#facc15">5.0 Pi</b></div>
+      </div>
+      <button id="btn-claim-100" class="interactive-btn" style="background:#10b981; color:#fff;" onclick="claimBossReward(100, 5.0)">Nhận Thưởng</button>
+    </div>
+
+    <button class="interactive-btn" style="width: 100%; background: #eab308; color: #0f172a; margin-top: 6px; padding: 9px;" onclick="withdrawRewardPi()">RÚT PI VỀ VÍ MAINNET</button>
+    <button class="modal-btn-close" onclick="closeAllPanels()">Đóng</button>
+  </div>
+
+  <!-- Modal Quỹ Đầu Tư -->
+  <div id="invest-modal" class="modal-box" style="border: 2px solid #6366f1;">
+    <h2 style="color: #818cf8; margin-bottom: 6px; font-size: 18px;">🏦 QUỸ ĐẦU TƯ GAME (POOL 1000 PI)</h2>
+    <p style="font-size: 11px; color: #94a3b8;">Đầu tư nhận chia sẻ doanh thu ròng từ game</p>
+    
+    <div class="panel-card">
+      <div>Tổng quỹ mục tiêu: <b>1000 Pi</b></div>
+      <div>Đã huy động: <b id="ui-pool-invested" style="color:#38bdf8">0.0 Pi</b> / 1000 Pi</div>
+      <div>Phần góp của bạn: <b id="ui-my-invest" style="color:#facc15">0.0 Pi</b></div>
+      <div>Tỷ lệ hoa hồng: <b id="ui-my-shares" style="color:#34d399">0.00%</b></div>
+    </div>
+
+    <div class="panel-card">
+      <div style="margin-bottom: 6px;"><b>Góp Vốn Thêm (Hạn mức: 5 - 10 Pi):</b></div>
+      <div style="display: flex; gap: 8px;">
+        <input type="number" id="invest-amount-input" min="5" max="10" step="1" value="5" style="width: 70%; padding: 6px; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: #fff;">
+        <button class="interactive-btn" style="background:#6366f1; color:#fff; width: 30%;" onclick="executeInvestment()">Đầu Tư</button>
+      </div>
+    </div>
+    <button class="modal-btn-close" onclick="closeAllPanels()">Đóng</button>
+  </div>
+
+  <!-- Modal Lịch Sử -->
+  <div id="history-modal" class="modal-box" style="border: 2px solid #38bdf8;">
+    <h2 style="color: #38bdf8; margin-bottom: 6px; font-size: 18px;">📜 LỊCH SỬ HOẠT ĐỘNG</h2>
+    <div style="text-align: left; margin: 6px 0; font-size: 12px; color: #94a3b8;">Kết quả tổng kết các trận đấu:</div>
+    <div id="log-boss-kill" class="log-container"></div>
+
+    <div style="text-align: left; margin: 6px 0; font-size: 12px; color: #94a3b8;">Nhật ký nhận thưởng & rút Pi:</div>
+    <div id="log-reward-tx" class="log-container"></div>
+    <button class="modal-btn-close" onclick="closeAllPanels()">Đóng</button>
+  </div>
+
+  <!-- Modal Shop -->
+  <div id="shop-modal" class="modal-box" style="border: 2px solid #facc15;">
+    <h2 style="color: #facc15; margin-bottom: 10px; font-size: 18px;">CỬA HÀNG VẬT PHẨM</h2>
+    <div class="panel-card" style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
         <strong>Đạn Plasma Cực Đại</strong>
         <div style="font-size: 11px; color: #94a3b8;">Đạn to hơn, tăng sát thương x2</div>
       </div>
-      <button class="shop-btn-buy" onclick="buyItem('power_buff', 0.2, 'Buff Đạn Plasma')">0.2 Pi</button>
+      <button class="interactive-btn" style="background:#facc15; color:#0f172a;" onclick="buyItem('power_buff', 0.2, 'Buff Đạn Plasma')">0.2 Pi</button>
     </div>
-    <div class="shop-item">
-      <div style="text-align: left;">
-        <strong>Giáp Hoàng Kim 3D (Skin VIP)</strong>
-        <div style="font-size: 11px; color: #94a3b8;">Skin giáp vàng kim 3D & +10 chiến binh</div>
+    <div class="panel-card" style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <strong>Giáp Hoàng Kim 3D</strong>
+        <div style="font-size: 11px; color: #94a3b8;">Skin giáp vàng & +10 chiến binh</div>
       </div>
-      <button class="shop-btn-buy" onclick="buyItem('golden_skin', 0.5, 'Skin Giáp Hoàng Kim')">0.5 Pi</button>
+      <button class="interactive-btn" style="background:#facc15; color:#0f172a;" onclick="buyItem('golden_skin', 0.5, 'Skin Giáp Hoàng Kim')">0.5 Pi</button>
     </div>
-    <button class="close-shop-btn" onclick="toggleShop(false)">Đóng Cửa Hàng</button>
+    <button class="modal-btn-close" onclick="closeAllPanels()">Đóng</button>
   </div>
 
   <canvas id="gameCanvas" width="540" height="800"></canvas>
@@ -288,6 +379,116 @@
     let currentUser = null;
     let hasGoldenSkin = false;
     let hasPowerBuff = false;
+    let gameSpeedMultiplier = 1.0;
+
+    let isKYCVerified = false; 
+    let maxSingleMatchBossKills = parseInt(localStorage.getItem("pi_max_match_boss") || "0");
+    let pendingRewardPi = parseFloat(localStorage.getItem("pi_pending_reward") || "0.0");
+    let claimedMilestones = JSON.parse(localStorage.getItem("pi_claimed_milestones") || "[]");
+
+    let poolInvested = parseFloat(localStorage.getItem("pi_pool_invested") || "320.0");
+    let userInvestment = parseFloat(localStorage.getItem("pi_user_investment") || "0.0");
+
+    let matchResultLogs = JSON.parse(localStorage.getItem("pi_logs_match_results") || "[]");
+    let rewardLogs = JSON.parse(localStorage.getItem("pi_logs_rewards") || "[]");
+
+    function closeAllPanels() {
+      document.getElementById("drawer-menu").style.display = "none";
+      const modals = document.querySelectorAll(".modal-box");
+      modals.forEach(m => m.style.display = "none");
+    }
+
+    function toggleDrawer() {
+      const drawer = document.getElementById("drawer-menu");
+      const isShowing = drawer.style.display === "flex";
+      closeAllPanels();
+      if (!isShowing) {
+        if (gameState === "PLAYING") togglePause();
+        drawer.style.display = "flex";
+      }
+    }
+
+    function openSingleModal(modalId) {
+      closeAllPanels();
+      if (gameState === "PLAYING") togglePause();
+      updateEcosystemUI();
+      renderLogs();
+      const target = document.getElementById(modalId);
+      if (target) target.style.display = "block";
+    }
+
+    function getFormattedTime() {
+      const d = new Date();
+      const hours = d.getHours().toString().padStart(2, '0');
+      const minutes = d.getMinutes().toString().padStart(2, '0');
+      const seconds = d.getSeconds().toString().padStart(2, '0');
+      const day = d.getDate().toString().padStart(2, '0');
+      const month = (d.getMonth() + 1).toString().padStart(2, '0');
+      const year = d.getFullYear();
+      return `${hours}:${minutes}:${seconds} - ${day}/${month}/${year}`;
+    }
+
+    // CHỈ GHI NHẬN KẾT QUẢ CUỐI CÙNG CỦA 1 TRẬN
+    function addMatchResultLog(mode, bossesKilled, finalScore) {
+      const modeName = mode === "RUNNER" ? "Chạy Vượt Ải" : "Thủ Thành Cổng Cổ";
+      const isNewRecord = bossesKilled >= maxSingleMatchBossKills && bossesKilled > 0 ? " 🌟[Kỷ Lục Mới]" : "";
+      const entry = `[${getFormattedTime()}] Kết thúc trận (${modeName}): Diệt ${bossesKilled} Boss | Điểm: ${finalScore}${isNewRecord}`;
+      
+      matchResultLogs.unshift(entry);
+      if (matchResultLogs.length > 30) matchResultLogs.pop();
+      localStorage.setItem("pi_logs_match_results", JSON.stringify(matchResultLogs));
+      renderLogs();
+    }
+
+    function addRewardLog(action, amount) {
+      const entry = `[${getFormattedTime()}] ${action}: ${amount > 0 ? '+' : ''}${amount} Pi`;
+      rewardLogs.unshift(entry);
+      if (rewardLogs.length > 30) rewardLogs.pop();
+      localStorage.setItem("pi_logs_rewards", JSON.stringify(rewardLogs));
+      renderLogs();
+    }
+
+    function renderLogs() {
+      const bContainer = document.getElementById("log-boss-kill");
+      const rContainer = document.getElementById("log-reward-tx");
+      if (bContainer) {
+        bContainer.innerHTML = matchResultLogs.length ? matchResultLogs.map(l => `<div class="log-item">${l}</div>`).join('') : '<div style="color:#64748b">Chưa có kết quả trận đấu nào.</div>';
+      }
+      if (rContainer) {
+        rContainer.innerHTML = rewardLogs.length ? rewardLogs.map(l => `<div class="log-item">${l}</div>`).join('') : '<div style="color:#64748b">Chưa có giao dịch.</div>';
+      }
+    }
+
+    function updateEcosystemUI() {
+      document.getElementById("ui-max-match-boss").innerText = `${maxSingleMatchBossKills} Boss`;
+      document.getElementById("ui-pending-pi").innerText = pendingRewardPi.toFixed(2) + " Pi";
+      
+      const kycEl = document.getElementById("ui-kyc-status");
+      if (isKYCVerified) {
+        kycEl.innerHTML = "<b style='color:#34d399'>✔ Đã KYC / Mainnet</b>";
+      } else {
+        kycEl.innerHTML = "<b style='color:#ef4444'>Chưa KYC / Sandbox test</b>";
+      }
+
+      document.getElementById("ui-pool-invested").innerText = poolInvested.toFixed(1) + " Pi";
+      document.getElementById("ui-my-invest").innerText = userInvestment.toFixed(1) + " Pi";
+      const sharePct = poolInvested > 0 ? ((userInvestment / 1000) * 100).toFixed(2) : 0;
+      document.getElementById("ui-my-shares").innerText = `${sharePct}% doanh thu ròng`;
+
+      const btn50 = document.getElementById("btn-claim-50");
+      if (claimedMilestones.includes(50)) {
+        btn50.disabled = true; btn50.innerText = "Đã nhận"; btn50.style.background = "#475569";
+      } else {
+        btn50.disabled = maxSingleMatchBossKills < 50;
+      }
+
+      const btn100 = document.getElementById("btn-claim-100");
+      if (claimedMilestones.includes(100)) {
+        btn100.disabled = true; btn100.innerText = "Đã nhận"; btn100.style.background = "#475569";
+      } else {
+        btn100.disabled = maxSingleMatchBossKills < 100;
+      }
+    }
 
     async function initPi() {
       if (typeof window.Pi === "undefined") return;
@@ -303,17 +504,95 @@
       if (!window.Pi || isAuthenticating) return;
       isAuthenticating = true;
       try {
-        const authResult = await window.Pi.authenticate(["username", "payments"], (p) => console.log(p));
+        const authResult = await window.Pi.authenticate(["username", "payments", "wallet_address"], (p) => console.log(p));
         currentUser = authResult.user;
+        isKYCVerified = true; 
         document.getElementById("sign-in-button").style.display = "none";
         const userProfile = document.getElementById("user-profile");
         userProfile.style.display = "block";
-        userProfile.innerText = `@${currentUser.username}`;
+        userProfile.innerText = `KYC ✔ @${currentUser.username}`;
+        updateEcosystemUI();
       } catch (error) {
         console.error("Lỗi đăng nhập:", error);
       } finally {
         isAuthenticating = false;
       }
+    }
+
+    function claimBossReward(milestone, amount) {
+      if (!isKYCVerified) {
+        alert("Bạn cần đăng nhập tài khoản Pi Network đã hoàn tất KYC để nhận thưởng!");
+        return;
+      }
+      if (maxSingleMatchBossKills < milestone) {
+        alert(`Kỷ lục 1 trận của bạn hiện là ${maxSingleMatchBossKills} Boss, chưa đạt mốc ${milestone} Boss trong 1 trận!`);
+        return;
+      }
+      if (claimedMilestones.includes(milestone)) {
+        alert("Bạn đã nhận phần thưởng cho mốc này rồi!");
+        return;
+      }
+
+      claimedMilestones.push(milestone);
+      pendingRewardPi += amount;
+      localStorage.setItem("pi_claimed_milestones", JSON.stringify(claimedMilestones));
+      localStorage.setItem("pi_pending_reward", pendingRewardPi.toString());
+      
+      addRewardLog(`Nhận thưởng Kỷ Lục 1 trận ≥ ${milestone} Boss`, amount);
+      updateEcosystemUI();
+      alert(`Chúc mừng! Đã nhận ${amount} Pi thưởng vào số dư chờ rút.`);
+    }
+
+    function withdrawRewardPi() {
+      if (!isKYCVerified) {
+        alert("Vui lòng xác thực tài khoản Pi KYC / Mainnet trước khi rút!");
+        return;
+      }
+      if (pendingRewardPi <= 0) {
+        alert("Số dư Pi thưởng hiện tại là 0 Pi.");
+        return;
+      }
+      const amountWithdrawn = pendingRewardPi;
+      pendingRewardPi = 0;
+      localStorage.setItem("pi_pending_reward", "0");
+      addRewardLog(`Rút Pi về ví Mainnet`, -amountWithdrawn);
+      updateEcosystemUI();
+      alert(`Yêu cầu rút ${amountWithdrawn.toFixed(2)} Pi về ví Mainnet đã được tạo thành công!`);
+    }
+
+    function executeInvestment() {
+      if (!currentUser) {
+        alert("Vui lòng đăng nhập tài khoản Pi trước khi đầu tư!");
+        return;
+      }
+      const amtInput = parseFloat(document.getElementById("invest-amount-input").value);
+      if (isNaN(amtInput) || amtInput < 5 || amtInput > 10) {
+        alert("Số Pi đầu tư mỗi lần phải từ 5 Pi đến 10 Pi!");
+        return;
+      }
+      if (poolInvested + amtInput > 1000) {
+        alert(`Quỹ chỉ còn nhận tối đa ${(1000 - poolInvested).toFixed(1)} Pi nữa!`);
+        return;
+      }
+
+      window.Pi.createPayment({
+        amount: amtInput,
+        memo: `Góp vốn Quỹ Game Mob Run (${amtInput} Pi)`,
+        metadata: { type: "investment", amount: amtInput }
+      }, {
+        onReadyForServerApproval: (pid) => console.log("Approval:", pid),
+        onReadyForServerCompletion: (pid, txid) => {
+          poolInvested += amtInput;
+          userInvestment += amtInput;
+          localStorage.setItem("pi_pool_invested", poolInvested.toString());
+          localStorage.setItem("pi_user_investment", userInvestment.toString());
+          addRewardLog(`Đầu tư vào Quỹ Game`, amtInput);
+          updateEcosystemUI();
+          alert(`Đầu tư thành công ${amtInput} Pi vào quỹ!`);
+        },
+        onCancel: () => {},
+        onError: () => alert("Giao dịch đầu tư thất bại.")
+      });
     }
 
     function buyItem(itemType, amountPi, memoText) {
@@ -329,7 +608,7 @@
         onReadyForServerApproval: (pid) => console.log("Approval:", pid),
         onReadyForServerCompletion: (pid, txid) => {
           applyPurchasedItem(itemType);
-          toggleShop(false);
+          closeAllPanels();
           alert(`Đã nhận: ${memoText}`);
         },
         onCancel: () => {},
@@ -337,44 +616,59 @@
       });
     }
 
+    function triggerSafeRevive() {
+      mobCount = 50;
+      gameSpeedMultiplier = 0.7;
+      playerX = SCREEN_WIDTH / 2;
+      bullets = [];
+      bossBullets = [];
+
+      for (let boss of bosses) {
+        if (boss.y > playerY - 300) boss.y = playerY - 350;
+      }
+      for (let e of redEnemies) {
+        if (e.y > playerY - 200) e.y -= 300;
+      }
+      for (let bar of barricades) {
+        if (bar.y > playerY - 150) bar.y -= 250;
+      }
+
+      gameState = "PLAYING";
+      triggerGateBuffEffect(playerX, playerY, 50);
+    }
+
     function applyPurchasedItem(itemType) {
       if (itemType === 'power_buff') hasPowerBuff = true;
       else if (itemType === 'golden_skin') { hasGoldenSkin = true; mobCount += 10; }
-      else if (itemType === 'revive') { 
-        mobCount = 20; 
-        gameState = "PLAYING"; 
-        bullets = [];
-        bossBullets = [];
-      }
+      else if (itemType === 'revive') { triggerSafeRevive(); }
     }
 
-    // TÍCH HỢP XEM QUẢNG CÁO ĐỂ HỒI SINH (PI ADS SDK)
     async function watchAdToRevive() {
       if (window.Pi && window.Pi.Ads) {
         try {
           const isReady = await window.Pi.Ads.isAdReady("rewarded_video");
-          if (!isReady) {
-            await window.Pi.Ads.requestAd("rewarded_video");
-          }
+          if (!isReady) await window.Pi.Ads.requestAd("rewarded_video");
           const response = await window.Pi.Ads.showAd("rewarded_video");
           if (response && response.result === "AD_REWARDED") {
-            applyPurchasedItem('revive');
-            alert("Bạn đã xem hết video và được hồi sinh với 20 lính!");
+            triggerSafeRevive();
+            alert("Đã xem video: Hồi sinh 50 lính & Giảm 30% tốc độ game!");
             return;
           }
         } catch (err) {
-          console.warn("Pi Ads chưa sẵn sàng trên môi trường test, kích hoạt chế độ giả lập Ads:", err);
+          console.warn("Chuyển chế độ giả lập Ads:", err);
         }
       }
 
-      // Giả lập quảng cáo khi chạy test trên trình duyệt ngoài Pi Browser
-      const simulatedAd = confirm("🎬 Đang chiếu video quảng cáo (Giả lập)...\nNhấn 'OK' để hoàn thành xem video và hồi sinh.");
-      if (simulatedAd) {
-        applyPurchasedItem('revive');
-      }
+      const simulatedAd = confirm("🎬 Đang chiếu video quảng cáo (Giả lập)...\nNhấn 'OK' để nhận 50 lính và tiếp tục chơi.");
+      if (simulatedAd) triggerSafeRevive();
     }
 
-    window.addEventListener("DOMContentLoaded", initPi);
+    window.addEventListener("DOMContentLoaded", () => {
+      initPi();
+      renderLogs();
+      updateEcosystemUI();
+      openSingleModal('mode-modal');
+    });
 
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
@@ -408,7 +702,7 @@
 
     function startSelectedMode(mode) {
       selectedGameMode = mode;
-      document.getElementById("mode-modal").style.display = "none";
+      closeAllPanels();
       initGame();
     }
 
@@ -419,16 +713,6 @@
       } else if (gameState === "PAUSED") {
         gameState = "PLAYING";
         document.getElementById("pause-btn").innerText = "⏸ Tạm Dừng";
-      }
-    }
-
-    function toggleShop(show) {
-      const modal = document.getElementById("shop-modal");
-      if (show) {
-        if (gameState === "PLAYING") togglePause();
-        modal.style.display = "block";
-      } else {
-        modal.style.display = "none";
       }
     }
 
@@ -450,17 +734,12 @@
 
     function triggerGateBuffEffect(x, y, val) {
       shockwaves.push({
-        x: x,
-        y: y,
-        r: 10,
-        maxR: 95,
-        alpha: 1.0,
+        x: x, y: y, r: 10, maxR: 95, alpha: 1.0,
         color: val >= 10 ? "#facc15" : "#38bdf8"
       });
 
       floatingTexts.push({
-        x: x,
-        y: y - 20,
+        x: x, y: y - 20,
         text: `+${val} LÍNH!`,
         alpha: 1.0,
         color: val >= 10 ? "#facc15" : "#38bdf8",
@@ -471,8 +750,7 @@
         const angle = Math.random() * Math.PI * 2;
         const speed = Math.random() * 7 + 3;
         particles.push({
-          x: x,
-          y: y,
+          x: x, y: y,
           vx: Math.cos(angle) * speed,
           vy: Math.sin(angle) * speed,
           radius: Math.random() * 4 + 2,
@@ -497,30 +775,15 @@
 
       if (isBlue) {
         if (hasGoldenSkin) {
-          armorGrad.addColorStop(0, '#fef08a');
-          armorGrad.addColorStop(0.5, '#eab308');
-          armorGrad.addColorStop(1, '#854d0e');
-
-          helmetGrad.addColorStop(0, '#ffffff');
-          helmetGrad.addColorStop(0.4, '#facc15');
-          helmetGrad.addColorStop(1, '#a16207');
+          armorGrad.addColorStop(0, '#fef08a'); armorGrad.addColorStop(0.5, '#eab308'); armorGrad.addColorStop(1, '#854d0e');
+          helmetGrad.addColorStop(0, '#ffffff'); helmetGrad.addColorStop(0.4, '#facc15'); helmetGrad.addColorStop(1, '#a16207');
         } else {
-          armorGrad.addColorStop(0, '#60a5fa');
-          armorGrad.addColorStop(0.5, '#2563eb');
-          armorGrad.addColorStop(1, '#1e3a8a');
-
-          helmetGrad.addColorStop(0, '#93c5fd');
-          helmetGrad.addColorStop(0.4, '#3b82f6');
-          helmetGrad.addColorStop(1, '#1d4ed8');
+          armorGrad.addColorStop(0, '#60a5fa'); armorGrad.addColorStop(0.5, '#2563eb'); armorGrad.addColorStop(1, '#1e3a8a');
+          helmetGrad.addColorStop(0, '#93c5fd'); helmetGrad.addColorStop(0.4, '#3b82f6'); helmetGrad.addColorStop(1, '#1d4ed8');
         }
       } else {
-        armorGrad.addColorStop(0, '#f87171');
-        armorGrad.addColorStop(0.5, '#dc2626');
-        armorGrad.addColorStop(1, '#7f1d1d');
-
-        helmetGrad.addColorStop(0, '#fca5a5');
-        helmetGrad.addColorStop(0.4, '#ef4444');
-        helmetGrad.addColorStop(1, '#991b1b');
+        armorGrad.addColorStop(0, '#f87171'); armorGrad.addColorStop(0.5, '#dc2626'); armorGrad.addColorStop(1, '#7f1d1d');
+        helmetGrad.addColorStop(0, '#fca5a5'); helmetGrad.addColorStop(0.4, '#ef4444'); helmetGrad.addColorStop(1, '#991b1b');
       }
 
       ctx.fillStyle = armorGrad;
@@ -577,13 +840,6 @@
         ctx.strokeStyle = '#292524';
         ctx.lineWidth = 2.5;
         ctx.stroke();
-
-        ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.moveTo(rx - rw/2 + rad, ry - rh/2 + 2);
-        ctx.lineTo(rx + rw/2 - rad, ry - rh/2 + 2);
-        ctx.stroke();
       }
 
       drawRockBlock(-32, 50, 24, 28, 6);
@@ -602,69 +858,17 @@
 
       drawRockBlock(-58, 25 + armSwing, 34, 46, 12);
       drawRockBlock(58, 25 - armSwing, 34, 46, 12);
-
-      drawRockBlock(-64, 42 + armSwing, 12, 18, 4);
-      drawRockBlock(64, 42 - armSwing, 12, 18, 4);
-
       drawRockBlock(0, 10, 76, 60, 18);
 
       const glowCol = (flashTimer > 0) ? '#ffffff' : '#ff9800';
       ctx.shadowColor = '#ff5722';
       ctx.shadowBlur = 15;
-
       ctx.strokeStyle = glowCol;
       ctx.lineWidth = 4.5;
-      ctx.lineCap = 'round';
-      ctx.beginPath();
-      ctx.moveTo(-24, -6);
-      ctx.lineTo(0, 8);
-      ctx.lineTo(24, -6);
-      ctx.moveTo(0, 8);
-      ctx.lineTo(0, 28);
-      ctx.moveTo(-16, 20);
-      ctx.lineTo(0, 16);
-      ctx.lineTo(16, 20);
-      ctx.stroke();
-
-      ctx.fillStyle = (flashTimer > 0) ? '#fff' : '#ffeb3b';
-      ctx.beginPath();
-      ctx.arc(0, 10, 6, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.strokeRect(-20, -6, 40, 30);
       ctx.shadowBlur = 0;
 
       drawRockBlock(0, -32, 54, 46, 14);
-
-      const jawGrad = ctx.createLinearGradient(-22, -18, 22, -10);
-      jawGrad.addColorStop(0, '#57534e');
-      jawGrad.addColorStop(1, '#292524');
-      ctx.fillStyle = jawGrad;
-      ctx.beginPath();
-      ctx.roundRect(-22, -22, 44, 16, 6);
-      ctx.fill();
-      ctx.strokeStyle = '#1c1917';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      ctx.fillStyle = '#1c1917';
-      ctx.beginPath();
-      ctx.ellipse(-14, -36, 9, 8, 0, 0, Math.PI * 2);
-      ctx.ellipse(14, -36, 9, 8, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.shadowColor = '#ffeb3b';
-      ctx.shadowBlur = 10;
-      ctx.fillStyle = '#ff9800';
-      ctx.beginPath();
-      ctx.arc(-14, -36, 6, 0, Math.PI * 2);
-      ctx.arc(14, -36, 6, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#ffeb3b';
-      ctx.beginPath();
-      ctx.arc(-14, -36, 3.5, 0, Math.PI * 2);
-      ctx.arc(14, -36, 3.5, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur = 0;
 
       const hpPct = Math.max(0, hp / maxHp);
       ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
@@ -672,13 +876,12 @@
       ctx.fillStyle = hpPct > 0.5 ? "#22c55e" : (hpPct > 0.25 ? "#eab308" : "#ef4444");
       ctx.fillRect(-63, -72, 126 * hpPct, 10);
       ctx.strokeStyle = "#ffffff";
-      ctx.lineWidth = 1.5;
       ctx.strokeRect(-65, -74, 130, 14);
 
       ctx.fillStyle = "#ffffff";
       ctx.font = "bold 11px Arial";
       ctx.textAlign = "center";
-      ctx.fillText(`GOLEM ĐÁ LAVA #${level} [${Math.ceil(hp)}/${maxHp}]`, 0, -82);
+      ctx.fillText(`GOLEM #${level} [${Math.ceil(hp)}/${maxHp}]`, 0, -82);
 
       ctx.restore();
     }
@@ -686,35 +889,18 @@
     function drawMedievalCastleGate(x, y) {
       ctx.save();
       ctx.translate(x, y);
-
       ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
       ctx.beginPath();
       ctx.ellipse(0, 110, 240, 30, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      function drawStoneWallTexture(wx, wy, ww, wh) {
-        const stoneGrad = ctx.createLinearGradient(wx, wy, wx + ww, wy + wh);
-        stoneGrad.addColorStop(0, '#c7b299');
-        stoneGrad.addColorStop(0.3, '#a8947a');
-        stoneGrad.addColorStop(0.7, '#85735c');
-        stoneGrad.addColorStop(1, '#5c4d3c');
-        ctx.fillStyle = stoneGrad;
-        ctx.fillRect(wx, wy, ww, wh);
-        ctx.strokeStyle = "#382d22";
-        ctx.lineWidth = 2;
-        ctx.strokeRect(wx, wy, ww, wh);
-
-        ctx.strokeStyle = "rgba(45, 35, 25, 0.4)";
-        ctx.lineWidth = 1.5;
-        for (let row = wy + 16; row < wy + wh; row += 16) {
-          ctx.beginPath();
-          ctx.moveTo(wx, row);
-          ctx.lineTo(wx + ww, row);
-          ctx.stroke();
-        }
-      }
-
-      drawStoneWallTexture(-120, -10, 240, 110);
+      const stoneGrad = ctx.createLinearGradient(-120, -10, 120, 100);
+      stoneGrad.addColorStop(0, '#c7b299');
+      stoneGrad.addColorStop(1, '#5c4d3c');
+      ctx.fillStyle = stoneGrad;
+      ctx.fillRect(-120, -10, 240, 110);
+      ctx.strokeStyle = "#382d22";
+      ctx.strokeRect(-120, -10, 240, 110);
 
       ctx.fillStyle = "#120f0d";
       ctx.beginPath();
@@ -724,106 +910,10 @@
       ctx.closePath();
       ctx.fill();
 
-      ctx.strokeStyle = "#d4be9b";
-      ctx.lineWidth = 10;
-      ctx.beginPath();
-      ctx.arc(0, 30, 60, Math.PI, 0, false);
-      ctx.stroke();
-      ctx.strokeStyle = "#382d22";
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      for (let bx = -100; bx <= 70; bx += 38) {
-        drawStoneWallTexture(bx, -34, 26, 24);
-      }
-
-      function drawTower(tx) {
-        drawStoneWallTexture(tx - 48, -40, 96, 145);
-
-        const balconyGrad = ctx.createLinearGradient(tx - 58, -90, tx + 58, -40);
-        balconyGrad.addColorStop(0, '#dfceb8');
-        balconyGrad.addColorStop(1, '#705e4a');
-        ctx.fillStyle = balconyGrad;
-        ctx.beginPath();
-        ctx.moveTo(tx - 48, -40);
-        ctx.lineTo(tx - 60, -85);
-        ctx.lineTo(tx + 60, -85);
-        ctx.lineTo(tx + 48, -40);
-        ctx.closePath();
-        ctx.fill();
-        ctx.strokeStyle = "#2e241b";
-        ctx.lineWidth = 2.5;
-        ctx.stroke();
-
-        ctx.strokeStyle = "#382d22";
-        ctx.lineWidth = 3;
-        for (let rx = tx - 44; rx <= tx + 44; rx += 14) {
-          ctx.beginPath();
-          ctx.moveTo(rx, -40);
-          ctx.lineTo(rx + (rx > tx ? 4 : -4), -85);
-          ctx.stroke();
-        }
-
-        for (let mx = tx - 56; mx <= tx + 34; mx += 26) {
-          drawStoneWallTexture(mx, -108, 20, 24);
-        }
-
-        ctx.fillStyle = "#120e0b";
-        ctx.beginPath();
-        ctx.arc(tx, -60, 11, Math.PI, 0);
-        ctx.lineTo(tx + 11, -44);
-        ctx.lineTo(tx - 11, -44);
-        ctx.closePath();
-        ctx.fill();
-        ctx.strokeStyle = "#e5d5be";
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        ctx.fillStyle = "#120e0b";
-        ctx.fillRect(tx - 7, 20, 14, 24);
-        ctx.strokeStyle = "#45382b";
-        ctx.strokeRect(tx - 7, 20, 14, 24);
-      }
-
-      drawTower(-160);
-      drawTower(160);
-
-      function drawIronGateDoor(gx, angle) {
-        ctx.save();
-        ctx.translate(gx, 50);
-        ctx.rotate(angle);
-
-        ctx.strokeStyle = "#4a3c31";
-        ctx.fillStyle = "#261e18";
-        ctx.lineWidth = 4;
-        
-        ctx.strokeRect(-3, -25, 42, 70);
-        ctx.beginPath();
-        ctx.moveTo(0, -25); ctx.lineTo(40, 45);
-        ctx.moveTo(40, -25); ctx.lineTo(0, 45);
-        ctx.stroke();
-
-        for (let sp = 2; sp <= 38; sp += 9) {
-          ctx.beginPath();
-          ctx.moveTo(sp, -25);
-          ctx.lineTo(sp, -36);
-          ctx.lineTo(sp + 3, -42);
-          ctx.lineTo(sp + 6, -36);
-          ctx.lineTo(sp + 6, -25);
-          ctx.fill();
-          ctx.stroke();
-        }
-        ctx.restore();
-      }
-
-      drawIronGateDoor(-52, 0.45);
-      drawIronGateDoor(20, -0.45);
-
       ctx.fillStyle = "#facc15";
       ctx.font = "bold 13px serif";
       ctx.textAlign = "center";
-      ctx.fillText("🏰 PHÁO ĐÀI CỔ TRUNG CỔ 🏰", 0, -50);
-
+      ctx.fillText("🏰 THÀNH CỔ TRUNG CỔ (ĐỘ KHÓ CAO) 🏰", 0, -50);
       ctx.restore();
     }
 
@@ -881,6 +971,7 @@
       bossDefeated = 0;
       currentBossLevel = 1;
       scrollSpeed = 1.8;
+      gameSpeedMultiplier = 1.0;
       autoShootTimer = 0;
       bullets = [];
       bossBullets = [];
@@ -898,12 +989,11 @@
       }
     }
 
-    // ĐIỀU CHỈNH CỐ ĐỊNH: BẮN ĐÚNG 4 TIA ĐẠN
     function shootBullets() {
       if (gameState !== "PLAYING" || mobCount <= 0) return;
 
       const totalGuns = 4;
-      const spacing = 12; // Khoảng cách giữa các tia đạn
+      const spacing = 12;
 
       for (let g = 0; g < totalGuns; g++) {
         const ox = (g - (totalGuns - 1) / 2) * spacing;
@@ -985,7 +1075,7 @@
         }
 
         if (selectedGameMode === "RUNNER") {
-          scrollSpeed = 1.8 + Math.min(2.0, bossDefeated * 0.25);
+          scrollSpeed = (1.8 + Math.min(2.0, bossDefeated * 0.25)) * gameSpeedMultiplier;
           
           autoShootTimer++;
           const shootInterval = hasPowerBuff ? 3 : 4;
@@ -1026,12 +1116,13 @@
         }
 
         if (selectedGameMode === "GATE_DEFENSE") {
-          if (gameTick % 42 === 0) {
+          const spawnEnemyInterval = Math.round(42 / gameSpeedMultiplier);
+          if (gameTick % spawnEnemyInterval === 0) {
             redEnemies.push({
               x: SCREEN_WIDTH / 2 + (Math.random() * 40 - 20),
               y: 155,
-              vx: (Math.random() * 2.5 - 1.25),
-              vy: (Math.random() * 1.2 + 1.2),
+              vx: (Math.random() * 2.5 - 1.25) * gameSpeedMultiplier,
+              vy: (Math.random() * 1.2 + 1.2) * gameSpeedMultiplier,
               alive: true
             });
           }
@@ -1047,7 +1138,7 @@
               maxHp: bossHp,
               shootTimer: 0,
               moveDir: 1,
-              attackRate: Math.max(35, 75 - currentBossLevel * 3),
+              attackRate: Math.max(35, Math.round((75 - currentBossLevel * 3) / gameSpeedMultiplier)),
               flashTimer: 0,
               bobbing: 0
             });
@@ -1081,7 +1172,6 @@
                 mobCount += 1;
                 triggerGateBuffEffect(e.x, e.y, 1);
               }
-
               hit = true;
               break;
             }
@@ -1104,7 +1194,13 @@
                 const bossBonus = (selectedGameMode === "GATE_DEFENSE") ? 15 : 10;
                 mobCount += bossBonus;
                 triggerGateBuffEffect(boss.x, boss.y, bossBonus);
+
                 bossDefeated++;
+                if (bossDefeated > maxSingleMatchBossKills) {
+                  maxSingleMatchBossKills = bossDefeated;
+                  localStorage.setItem("pi_max_match_boss", maxSingleMatchBossKills.toString());
+                }
+                updateEcosystemUI();
               }
               hit = true;
               break;
@@ -1115,15 +1211,15 @@
 
         for (let i = bosses.length - 1; i >= 0; i--) {
           const boss = bosses[i];
-          boss.bobbing += 0.07;
+          boss.bobbing += 0.07 * gameSpeedMultiplier;
           
           if (selectedGameMode === "RUNNER") {
             boss.y += scrollSpeed;
           } else {
-            boss.y += 0.55 + Math.min(0.8, bossDefeated * 0.1);
+            boss.y += (0.55 + Math.min(0.8, bossDefeated * 0.1)) * gameSpeedMultiplier;
           }
 
-          boss.x += boss.moveDir * (1.3 + Math.min(1.7, bossDefeated * 0.15));
+          boss.x += boss.moveDir * (1.3 + Math.min(1.7, bossDefeated * 0.15)) * gameSpeedMultiplier;
           if (boss.x < 120 || boss.x > SCREEN_WIDTH - 120) boss.moveDir *= -1;
 
           if (boss.flashTimer > 0) boss.flashTimer--;
@@ -1136,11 +1232,13 @@
               const angle = Math.atan2(playerY - boss.y, playerX - boss.x);
               bossBullets.push({
                 x: boss.x - 20, y: boss.y + 40,
-                vx: Math.cos(angle - 0.12) * 4.2, vy: Math.sin(angle - 0.12) * 4.2
+                vx: Math.cos(angle - 0.12) * 4.2 * gameSpeedMultiplier, 
+                vy: Math.sin(angle - 0.12) * 4.2 * gameSpeedMultiplier
               });
               bossBullets.push({
                 x: boss.x + 20, y: boss.y + 40,
-                vx: Math.cos(angle + 0.12) * 4.2, vy: Math.sin(angle + 0.12) * 4.2
+                vx: Math.cos(angle + 0.12) * 4.2 * gameSpeedMultiplier, 
+                vy: Math.sin(angle + 0.12) * 4.2 * gameSpeedMultiplier
               });
             }
           }
@@ -1156,7 +1254,13 @@
               const bossBonus = (selectedGameMode === "GATE_DEFENSE") ? 15 : 10;
               mobCount += bossBonus;
               triggerGateBuffEffect(boss.x, boss.y, bossBonus);
+
               bossDefeated++;
+              if (bossDefeated > maxSingleMatchBossKills) {
+                maxSingleMatchBossKills = bossDefeated;
+                localStorage.setItem("pi_max_match_boss", maxSingleMatchBossKills.toString());
+              }
+              updateEcosystemUI();
               continue;
             }
           }
@@ -1169,6 +1273,7 @@
           }
         }
 
+        // ĐẠN BOSS TRÚNG TRỪ 2 LÍNH
         for (let i = bossBullets.length - 1; i >= 0; i--) {
           const bb = bossBullets[i];
           bb.x += bb.vx;
@@ -1213,10 +1318,12 @@
           }
         }
 
+        // KHI HẾT LÍNH (KẾT THÚC TRẬN ĐẤU -> GHI LOG DUY NHẤT 1 LẦN)
         if (mobCount <= 0) {
           mobCount = 0;
           gameState = "GAMEOVER";
           playSound('gameover');
+          addMatchResultLog(selectedGameMode, bossDefeated, score);
         }
       }
     }
@@ -1231,7 +1338,6 @@
         defenseBg.addColorStop(1, '#080605');
         ctx.fillStyle = defenseBg;
         ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
         drawMedievalCastleGate(SCREEN_WIDTH / 2, 130);
       } else {
         const roadGrad = ctx.createLinearGradient(0, 0, 0, SCREEN_HEIGHT);
@@ -1242,16 +1348,6 @@
         ctx.strokeStyle = "#334155";
         ctx.lineWidth = 3;
         ctx.strokeRect(30, 0, SCREEN_WIDTH - 60, SCREEN_HEIGHT);
-
-        ctx.strokeStyle = "rgba(148, 163, 184, 0.25)";
-        ctx.lineWidth = 2;
-        ctx.setLineDash([20, 20]);
-        ctx.lineDashOffset = -gameTick * scrollSpeed;
-        ctx.beginPath();
-        ctx.moveTo(SCREEN_WIDTH / 2, 0);
-        ctx.lineTo(SCREEN_WIDTH / 2, SCREEN_HEIGHT);
-        ctx.stroke();
-        ctx.setLineDash([]);
 
         for (let g of sideGates) {
           ctx.fillStyle = g.isLeft ? "rgba(2, 132, 199, 0.85)" : "rgba(234, 179, 8, 0.85)";
@@ -1274,10 +1370,6 @@
             ctx.beginPath();
             ctx.roundRect(bar.x, bar.y, bar.w, bar.h, 6);
             ctx.fill();
-            ctx.strokeStyle = "#64748b";
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
             ctx.fillStyle = "#f8fafc";
             ctx.font = "bold 18px Arial";
             ctx.textAlign = "center";
@@ -1314,20 +1406,12 @@
         ctx.beginPath();
         ctx.ellipse(b.x, b.y, hasPowerBuff ? 4.5 : 3.5, 9, 0, 0, Math.PI * 2);
         ctx.fill();
-        ctx.fillStyle = "#ffffff";
-        ctx.beginPath();
-        ctx.arc(b.x, b.y, 2, 0, Math.PI * 2);
-        ctx.fill();
       }
 
       for (let bb of bossBullets) {
         ctx.fillStyle = "#ff5722";
         ctx.beginPath();
         ctx.arc(bb.x, bb.y, 7, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = "#ffeb3b";
-        ctx.beginPath();
-        ctx.arc(bb.x, bb.y, 3.5, 0, Math.PI * 2);
         ctx.fill();
       }
 
@@ -1376,80 +1460,65 @@
         ctx.fillText(`⚔ ${mobCount}`, playerX, playerY - clusterR - 14);
       }
 
-      ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
-      ctx.font = "12px Arial";
-      ctx.textAlign = "center";
-      if (selectedGameMode === "RUNNER") {
-        ctx.fillText("⚡ CHẾ ĐỘ 1: BẮN TỰ ĐỘNG (KÉO RÊ ĐỂ DI CHUYỂN) ⚡", SCREEN_WIDTH / 2, SCREEN_HEIGHT - 20);
-      } else {
-        ctx.fillText("⚡ CHẾ ĐỘ 2: NHẤP ĐỂ BẮN (DIỆT LÍNH +1, DIỆT TRÙM +15 LÍNH) ⚡", SCREEN_WIDTH / 2, SCREEN_HEIGHT - 20);
-      }
-
+      // Thanh trạng thái cố định trên cùng
       ctx.fillStyle = "rgba(15, 23, 42, 0.95)";
       ctx.fillRect(0, 0, SCREEN_WIDTH, 48);
       
       ctx.fillStyle = "#38bdf8";
-      ctx.font = "bold 15px Arial";
+      ctx.font = "bold 13px Arial";
       ctx.textAlign = "left";
-      ctx.fillText(`LÍNH: ${mobCount}`, 15, 30);
+      ctx.fillText(`LÍNH: ${mobCount}`, 105, 30);
 
       ctx.fillStyle = "#facc15";
       ctx.textAlign = "center";
-      ctx.fillText(`DIỆT: ${bossDefeated} 💀`, SCREEN_WIDTH / 2, 30);
-
-      ctx.fillStyle = "#cbd5e1";
-      ctx.textAlign = "right";
-      ctx.fillText(`KỶ LỤC: ${highScore}`, SCREEN_WIDTH - 15, 30);
+      ctx.fillText(`TRẬN NÀY: ${bossDefeated} 💀 | KỶ LỤC: ${maxSingleMatchBossKills}`, SCREEN_WIDTH / 2 + 35, 30);
 
       if (gameState === "PAUSED") {
         ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
         ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 30px Arial";
+        ctx.font = "bold 28px Arial";
         ctx.textAlign = "center";
         ctx.fillText("TRÒ CHƠI TẠM DỪNG", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
       }
 
-      // MÀN HÌNH GAME OVER VỚI 2 NÚT HỒI SINH
+      // Màn hình Game Over
       if (gameState === "GAMEOVER") {
         ctx.fillStyle = "rgba(10, 14, 23, 0.94)";
         ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
         ctx.fillStyle = "#ef4444";
-        ctx.font = "bold 34px Arial";
+        ctx.font = "bold 32px Arial";
         ctx.textAlign = "center";
         ctx.fillText("BẠN ĐÃ THẤT THỦ!", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 90);
 
         ctx.fillStyle = "#facc15";
-        ctx.font = "bold 20px Arial";
-        ctx.fillText(`Trùm đã diệt: ${bossDefeated}`, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 40);
+        ctx.font = "bold 18px Arial";
+        ctx.fillText(`Trận này: ${bossDefeated} Boss | Kỷ lục trận: ${maxSingleMatchBossKills} Boss`, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 45);
 
         ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 16px Arial";
-        ctx.fillText(`Điểm trận này: ${score}`, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 5);
-        ctx.fillText(`Điểm kỷ lục: ${highScore}`, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 20);
+        ctx.font = "bold 15px Arial";
+        ctx.fillText(`Điểm trận: ${score} | Kỷ lục điểm: ${highScore}`, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 15);
 
-        // Nút 1: Hồi sinh bằng Pi (Vàng)
         ctx.fillStyle = "#facc15";
         ctx.beginPath();
-        ctx.roundRect(SCREEN_WIDTH / 2 - 130, SCREEN_HEIGHT / 2 + 55, 260, 42, 10);
+        ctx.roundRect(SCREEN_WIDTH / 2 - 130, SCREEN_HEIGHT / 2 + 25, 260, 38, 10);
         ctx.fill();
         ctx.fillStyle = "#0f172a";
-        ctx.font = "bold 15px Arial";
-        ctx.fillText("⚡ HỒI SINH (0.1 Pi)", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 81);
+        ctx.font = "bold 14px Arial";
+        ctx.fillText("⚡ HỒI SINH (0.1 Pi)", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 49);
 
-        // Nút 2: Hồi sinh bằng Xem Video Quảng Cáo (Xanh lá)
         ctx.fillStyle = "#10b981";
         ctx.beginPath();
-        ctx.roundRect(SCREEN_WIDTH / 2 - 130, SCREEN_HEIGHT / 2 + 108, 260, 42, 10);
+        ctx.roundRect(SCREEN_WIDTH / 2 - 130, SCREEN_HEIGHT / 2 + 75, 260, 38, 10);
         ctx.fill();
         ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 15px Arial";
-        ctx.fillText("🎬 XEM QUẢNG CÁO ĐỂ HỒI SINH", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 134);
+        ctx.font = "bold 14px Arial";
+        ctx.fillText("🎬 XEM QUẢNG CÁO (+50 LÍNH)", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 99);
 
         ctx.fillStyle = "#94a3b8";
-        ctx.font = "13px Arial";
-        ctx.fillText("Chạm vị trí khác để về Menu đổi chế độ", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 180);
+        ctx.font = "12px Arial";
+        ctx.fillText("Chạm vị trí bất kỳ khác để về Menu chính", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 145);
       }
     }
 
@@ -1461,19 +1530,16 @@
         const cx = (e.clientX - rect.left) * scaleX;
         const cy = (e.clientY - rect.top) * scaleY;
 
-        // Bấm nút Hồi sinh bằng Pi (0.1 Pi)
         if (cx >= SCREEN_WIDTH / 2 - 130 && cx <= SCREEN_WIDTH / 2 + 130 &&
-            cy >= SCREEN_HEIGHT / 2 + 55 && cy <= SCREEN_HEIGHT / 2 + 97) {
-          buyItem('revive', 0.1, 'Hồi Sinh Nhân Vật (Mob Run)');
+            cy >= SCREEN_HEIGHT / 2 + 25 && cy <= SCREEN_HEIGHT / 2 + 63) {
+          buyItem('revive', 0.1, 'Hồi Sinh Nhân Vật');
         } 
-        // Bấm nút Xem Video Quảng Cáo để hồi sinh
         else if (cx >= SCREEN_WIDTH / 2 - 130 && cx <= SCREEN_WIDTH / 2 + 130 &&
-                 cy >= SCREEN_HEIGHT / 2 + 108 && cy <= SCREEN_HEIGHT / 2 + 150) {
+                 cy >= SCREEN_HEIGHT / 2 + 75 && cy <= SCREEN_HEIGHT / 2 + 113) {
           watchAdToRevive();
         } 
-        // Bấm ra ngoài để thoát về chọn chế độ
         else {
-          document.getElementById("mode-modal").style.display = "flex";
+          openSingleModal('mode-modal');
           gameState = "MENU";
         }
       }
