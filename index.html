@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Mob Run & Medieval Castle Gate Defense 3D</title>
+  <!-- Pi Network SDK & Pi Ads SDK -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
   <style>
     * {
@@ -317,7 +318,7 @@
 
     function buyItem(itemType, amountPi, memoText) {
       if (!window.Pi || !currentUser) {
-        alert("Vui lòng đăng nhập tài khoản Pi trước khi mua!");
+        alert("Vui lòng đăng nhập tài khoản Pi trước khi giao dịch!");
         return;
       }
       window.Pi.createPayment({
@@ -339,7 +340,38 @@
     function applyPurchasedItem(itemType) {
       if (itemType === 'power_buff') hasPowerBuff = true;
       else if (itemType === 'golden_skin') { hasGoldenSkin = true; mobCount += 10; }
-      else if (itemType === 'revive') { mobCount = 20; gameState = "PLAYING"; }
+      else if (itemType === 'revive') { 
+        mobCount = 20; 
+        gameState = "PLAYING"; 
+        bullets = [];
+        bossBullets = [];
+      }
+    }
+
+    // TÍCH HỢP XEM QUẢNG CÁO ĐỂ HỒI SINH (PI ADS SDK)
+    async function watchAdToRevive() {
+      if (window.Pi && window.Pi.Ads) {
+        try {
+          const isReady = await window.Pi.Ads.isAdReady("rewarded_video");
+          if (!isReady) {
+            await window.Pi.Ads.requestAd("rewarded_video");
+          }
+          const response = await window.Pi.Ads.showAd("rewarded_video");
+          if (response && response.result === "AD_REWARDED") {
+            applyPurchasedItem('revive');
+            alert("Bạn đã xem hết video và được hồi sinh với 20 lính!");
+            return;
+          }
+        } catch (err) {
+          console.warn("Pi Ads chưa sẵn sàng trên môi trường test, kích hoạt chế độ giả lập Ads:", err);
+        }
+      }
+
+      // Giả lập quảng cáo khi chạy test trên trình duyệt ngoài Pi Browser
+      const simulatedAd = confirm("🎬 Đang chiếu video quảng cáo (Giả lập)...\nNhấn 'OK' để hoàn thành xem video và hồi sinh.");
+      if (simulatedAd) {
+        applyPurchasedItem('revive');
+      }
     }
 
     window.addEventListener("DOMContentLoaded", initPi);
@@ -866,14 +898,15 @@
       }
     }
 
+    // ĐIỀU CHỈNH CỐ ĐỊNH: BẮN ĐÚNG 4 TIA ĐẠN
     function shootBullets() {
       if (gameState !== "PLAYING" || mobCount <= 0) return;
 
-      let guns = Math.floor(Math.min(18, Math.max(2, mobCount / 4)));
-      if (hasPowerBuff) guns = Math.min(24, guns + 6);
+      const totalGuns = 4;
+      const spacing = 12; // Khoảng cách giữa các tia đạn
 
-      for (let g = 0; g < guns; g++) {
-        const ox = (g - (guns - 1) / 2) * 8.5;
+      for (let g = 0; g < totalGuns; g++) {
+        const ox = (g - (totalGuns - 1) / 2) * spacing;
         bullets.push({ 
           x: playerX + ox, 
           y: playerY - 20, 
@@ -1068,12 +1101,9 @@
                 playSound('explosion');
                 bosses.splice(j, 1);
 
-                // CỘNG CỐ ĐỊNH 15 LÍNH KHI DIỆT BOSS Ở CHẾ ĐỘ 2
                 const bossBonus = (selectedGameMode === "GATE_DEFENSE") ? 15 : 10;
-
                 mobCount += bossBonus;
                 triggerGateBuffEffect(boss.x, boss.y, bossBonus);
-
                 bossDefeated++;
               }
               hit = true;
@@ -1126,7 +1156,6 @@
               const bossBonus = (selectedGameMode === "GATE_DEFENSE") ? 15 : 10;
               mobCount += bossBonus;
               triggerGateBuffEffect(boss.x, boss.y, bossBonus);
-
               bossDefeated++;
               continue;
             }
@@ -1381,35 +1410,46 @@
         ctx.fillText("TRÒ CHƠI TẠM DỪNG", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
       }
 
+      // MÀN HÌNH GAME OVER VỚI 2 NÚT HỒI SINH
       if (gameState === "GAMEOVER") {
-        ctx.fillStyle = "rgba(10, 14, 23, 0.92)";
+        ctx.fillStyle = "rgba(10, 14, 23, 0.94)";
         ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
         ctx.fillStyle = "#ef4444";
         ctx.font = "bold 34px Arial";
         ctx.textAlign = "center";
-        ctx.fillText("BẠN ĐÃ THẤT THỦ!", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 80);
+        ctx.fillText("BẠN ĐÃ THẤT THỦ!", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 90);
 
         ctx.fillStyle = "#facc15";
         ctx.font = "bold 20px Arial";
-        ctx.fillText(`Trùm đã diệt: ${bossDefeated}`, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 30);
+        ctx.fillText(`Trùm đã diệt: ${bossDefeated}`, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 40);
 
         ctx.fillStyle = "#ffffff";
         ctx.font = "bold 16px Arial";
-        ctx.fillText(`Điểm trận này: ${score}`, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 5);
-        ctx.fillText(`Điểm kỷ lục: ${highScore}`, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 30);
+        ctx.fillText(`Điểm trận này: ${score}`, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 5);
+        ctx.fillText(`Điểm kỷ lục: ${highScore}`, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 20);
 
+        // Nút 1: Hồi sinh bằng Pi (Vàng)
         ctx.fillStyle = "#facc15";
         ctx.beginPath();
-        ctx.roundRect(SCREEN_WIDTH / 2 - 110, SCREEN_HEIGHT / 2 + 65, 220, 42, 10);
+        ctx.roundRect(SCREEN_WIDTH / 2 - 130, SCREEN_HEIGHT / 2 + 55, 260, 42, 10);
         ctx.fill();
         ctx.fillStyle = "#0f172a";
         ctx.font = "bold 15px Arial";
-        ctx.fillText("HỒI SINH (0.1 Pi)", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 91);
+        ctx.fillText("⚡ HỒI SINH (0.1 Pi)", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 81);
+
+        // Nút 2: Hồi sinh bằng Xem Video Quảng Cáo (Xanh lá)
+        ctx.fillStyle = "#10b981";
+        ctx.beginPath();
+        ctx.roundRect(SCREEN_WIDTH / 2 - 130, SCREEN_HEIGHT / 2 + 108, 260, 42, 10);
+        ctx.fill();
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 15px Arial";
+        ctx.fillText("🎬 XEM QUẢNG CÁO ĐỂ HỒI SINH", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 134);
 
         ctx.fillStyle = "#94a3b8";
-        ctx.font = "14px Arial";
-        ctx.fillText("Chạm bất kỳ đâu bên ngoài để đổi chế độ chơi", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 135);
+        ctx.font = "13px Arial";
+        ctx.fillText("Chạm vị trí khác để về Menu đổi chế độ", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 180);
       }
     }
 
@@ -1421,10 +1461,18 @@
         const cx = (e.clientX - rect.left) * scaleX;
         const cy = (e.clientY - rect.top) * scaleY;
 
-        if (cx >= SCREEN_WIDTH / 2 - 110 && cx <= SCREEN_WIDTH / 2 + 110 &&
-            cy >= SCREEN_HEIGHT / 2 + 65 && cy <= SCREEN_HEIGHT / 2 + 107) {
+        // Bấm nút Hồi sinh bằng Pi (0.1 Pi)
+        if (cx >= SCREEN_WIDTH / 2 - 130 && cx <= SCREEN_WIDTH / 2 + 130 &&
+            cy >= SCREEN_HEIGHT / 2 + 55 && cy <= SCREEN_HEIGHT / 2 + 97) {
           buyItem('revive', 0.1, 'Hồi Sinh Nhân Vật (Mob Run)');
-        } else {
+        } 
+        // Bấm nút Xem Video Quảng Cáo để hồi sinh
+        else if (cx >= SCREEN_WIDTH / 2 - 130 && cx <= SCREEN_WIDTH / 2 + 130 &&
+                 cy >= SCREEN_HEIGHT / 2 + 108 && cy <= SCREEN_HEIGHT / 2 + 150) {
+          watchAdToRevive();
+        } 
+        // Bấm ra ngoài để thoát về chọn chế độ
+        else {
           document.getElementById("mode-modal").style.display = "flex";
           gameState = "MENU";
         }
